@@ -5,7 +5,7 @@ import HttpException from '@/utils/exceptions/http.exception';
 import UserService from '@/resources/user/user.service';
 
 
-export async function authenticated(req: Request, _res: Response, next: NextFunction) {
+export async function isAuthenticated(req: Request, _res: Response, next: NextFunction) {
     const token: string | undefined = req.cookies?.accessToken;
 
     if (!token) {
@@ -30,5 +30,3 @@ export async function authenticated(req: Request, _res: Response, next: NextFunc
         next(new HttpException(401, "Une erreur est survenue veuillez vous reconnecter"));
     }
 }
-
-export default { authenticated };
