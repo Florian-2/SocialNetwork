@@ -29,8 +29,10 @@ UserSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
         return next();
     }
-    const hash = await bcrypt_1.default.hash(this.password, 10);
-    this.password = hash; // this = user
-    next();
+    if (this.password) {
+        const hash = await bcrypt_1.default.hash(this.password, 10);
+        this.password = hash; // this = user
+        next();
+    }
 });
 exports.default = (0, mongoose_1.model)('users', UserSchema);

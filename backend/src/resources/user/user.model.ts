@@ -28,10 +28,11 @@ UserSchema.pre<User>('save', async function (next) {
         return next();
     }
 
-    const hash = await bcrypt.hash(this.password, 10);
-    this.password = hash; // this = user
-
-    next();
+    if (this.password) {
+        const hash = await bcrypt.hash(this.password, 10);
+        this.password = hash; // this = user
+        next();
+    }
 });
 
 export default model<User>('users', UserSchema);

@@ -1,3 +1,5 @@
+import { ObjectId } from "mongoose";
+import bcrypt from "bcrypt";
 import UserModel from '@/resources/user/user.model';
 import User from '@/resources/user/user.interface';
 import token from '@/utils/token';
@@ -13,8 +15,28 @@ class UserService {
             return { user, accessToken };
         }
         catch (error: any) {
-            console.log(error);
             throw error;
+        }
+    }
+
+    public async login(email: string, password: string): Promise<{ user: User, accessToken: string }> {
+        try {
+            let user = await this.getUserByEmail(email, { withPassword: true });
+            
+            if (await bcrypt.compare(password, user.password!)) {
+                const accessToken = token.createToken(user);
+
+                user = user.toObject();
+                delete user.password;
+                delete user.__v;
+             
+                return { user, accessToken };
+            }
+
+            throw new Error();
+        } 
+        catch (error: any) {
+            throw new Error("Adresse mail ou mot de passe incorrect"); // i18n => form.login
         }
     }
 
@@ -39,9 +61,9 @@ class UserService {
         }
     }
 
-    public async getUserById(userID: string, option: { withPassword: boolean }): Promise<User> {
+    public async getUserById(userID: string | ObjectId, option: { withPassword: boolean }): Promise<User> {
         try {
-            let user: User | null = null;
+            let user: User | null = null; 
 
             if (option.withPassword) {
                 user = await UserModel.findById(userID);

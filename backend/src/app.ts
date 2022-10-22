@@ -4,10 +4,7 @@ import compression from "compression";
 import morgan from "morgan";
 import cors from "cors";
 import helmet from "helmet";
-import path from 'path';
-import i18next from 'i18next'
-import Backend from 'i18next-fs-backend'
-import i18nextMiddleware from 'i18next-http-middleware'
+import cookieParser from 'cookie-parser';
 import Controller from '@/utils/interfaces/controller.interface';
 import ErrorMiddleware from "@/middleware/error.middleware";
 
@@ -21,30 +18,14 @@ class App {
 
 		this.initialiseDatabaseConnection();
 		this.initialiseMiddleware();
-		this.i18n();
 		this.initialiseControllers(controllers);
 		this.initialiseErrorHandling();
 	}
 
-	private i18n(): void {
-		const localesFolder = path.join(__dirname, "locales");
-
-		i18next
-			.use(i18nextMiddleware.LanguageDetector)
-			.use(Backend)
-			.init({
-				initImmediate: false,
-				fallbackLng: "fr",
-				backend: {
-					loadPath: path.join(localesFolder, "{{lng}}", "{{lng}}.json")
-				}
-			})
-	}
-
-	private initialiseMiddleware(): void {
-		this.express.use(i18nextMiddleware.handle(i18next));
+	private initialiseMiddleware(): void {	
+		this.express.use(cors());	
 		this.express.use(helmet());
-		this.express.use(cors());
+		this.express.use(cookieParser());
 		this.express.use(morgan('dev'));
 		this.express.use(express.json());
 		this.express.use(express.urlencoded({ extended: false }));

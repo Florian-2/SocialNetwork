@@ -8,8 +8,7 @@ const http_exception_1 = __importDefault(require("@/utils/exceptions/http.except
 const validation_middleware_1 = __importDefault(require("@/middleware/validation.middleware"));
 const user_validation_1 = require("@/resources/user/user.validation");
 const user_service_1 = __importDefault(require("@/resources/user/user.service"));
-const features_1 = require("@/utils/features");
-// import authenticated from '@/middleware/authenticated.middleware';
+const authenticated_middleware_1 = __importDefault(require("@/middleware/authenticated.middleware"));
 class UserController {
     path = '/users';
     router = (0, express_1.Router)();
@@ -18,27 +17,46 @@ class UserController {
         this.initialiseRoutes();
     }
     initialiseRoutes() {
-        this.router.post(`${this.path}/register`, (0, validation_middleware_1.default)(user_validation_1.register), this.register);
-        // this.router.post(`${this.path}/login`, validationMiddleware(validate.login), this.login);
-        // this.router.get(`${this.path}/profile`, authenticated, this.profile);
+        this.router.post(`${this.path}/register`, (0, validation_middleware_1.default)(user_validation_1.register), this.register.bind(this));
+        this.router.post(`${this.path}/login`, (0, validation_middleware_1.default)(user_validation_1.login), this.login.bind(this));
+        this.router.get(`${this.path}/profile`, authenticated_middleware_1.default.authenticated, this.profile);
     }
-    register = async (req, res, next) => {
+    async register(req, res, next) {
         try {
-            console.log(req.t("form.test"));
-            const { pseudo, email, password } = req.body;
-            const language = (0, features_1.getAcceptLanguage)(req.headers);
+            const { pseudo, email, password, language } = req.body;
             const result = await this.UserService.register(pseudo, email, password, language);
-            if (result) {
-                res.cookie("accessToken", result.accessToken, {
-                    httpOnly: true,
-                    sameSite: "lax"
-                });
-                res.status(201).json(result.user);
-            }
+            res.cookie("accessToken", result.accessToken, {
+                httpOnly: true,
+                sameSite: "lax"
+            });
+            res.status(201).json(result.user);
         }
         catch (error) {
             next(new http_exception_1.default(400, error.message));
         }
-    };
+    }
+    ;
+    async login(req, res, next) {
+        try {
+            const { email, password } = req.body;
+            const result = await this.UserService.login(email, password);
+            res.cookie("accessToken", result.accessToken, {
+                httpOnly: true,
+                sameSite: "lax"
+            });
+            res.status(201).json(result.user);
+        }
+        catch (error) {
+            next(new http_exception_1.default(400, error.message));
+        }
+    }
+    ;
+    profile(req, res, next) {
+        if (!req.user) {
+            return next(new http_exception_1.default(404, 'No logged in user'));
+        }
+        res.status(200).send(req.user);
+    }
+    ;
 }
 exports.default = UserController;

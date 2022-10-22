@@ -1,5 +1,5 @@
 {
     "form": {
-        "test": "Je suis Florian"
+        "required": "Champ requis"
     }
 }

@@ -9,10 +9,7 @@ const compression_1 = __importDefault(require("compression"));
 const morgan_1 = __importDefault(require("morgan"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
-const path_1 = __importDefault(require("path"));
-const i18next_1 = __importDefault(require("i18next"));
-const i18next_fs_backend_1 = __importDefault(require("i18next-fs-backend"));
-const i18next_http_middleware_1 = __importDefault(require("i18next-http-middleware"));
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const error_middleware_1 = __importDefault(require("@/middleware/error.middleware"));
 class App {
     express;
@@ -22,28 +19,13 @@ class App {
         this.port = port;
         this.initialiseDatabaseConnection();
         this.initialiseMiddleware();
-        this.i18n();
         this.initialiseControllers(controllers);
         this.initialiseErrorHandling();
     }
-    i18n() {
-        const localesFolder = path_1.default.join(__dirname, "locales");
-        console.log(localesFolder);
-        i18next_1.default
-            .use(i18next_http_middleware_1.default.LanguageDetector)
-            .use(i18next_fs_backend_1.default)
-            .init({
-            initImmediate: false,
-            fallbackLng: "fr",
-            backend: {
-                loadPath: path_1.default.join(localesFolder, "{{lng}}", "{{lng}}.json")
-            }
-        });
-    }
     initialiseMiddleware() {
-        this.express.use(i18next_http_middleware_1.default.handle(i18next_1.default));
-        this.express.use((0, helmet_1.default)());
         this.express.use((0, cors_1.default)());
+        this.express.use((0, helmet_1.default)());
+        this.express.use((0, cookie_parser_1.default)());
         this.express.use((0, morgan_1.default)('dev'));
         this.express.use(express_1.default.json());
         this.express.use(express_1.default.urlencoded({ extended: false }));

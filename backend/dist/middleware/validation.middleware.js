@@ -3,12 +3,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 function validationFormData(schema) {
     return async (req, res, next) => {
         try {
-            schema.parseAsync(req.body);
+            await schema.parseAsync(req.body);
             next();
         }
-        catch (error) {
-            console.log(error);
-            res.status(400).send({ error });
+        catch (e) {
+            const err = e;
+            const formatZodError = [];
+            for (const e of err.issues) {
+                formatZodError.push({
+                    field: e.path[0],
+                    message: e.message
+                });
+            }
+            res.status(400).send({ errors: formatZodError });
         }
     };
 }
