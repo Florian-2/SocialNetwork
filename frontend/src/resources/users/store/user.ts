@@ -1,4 +1,4 @@
-import { ref, computed, reactive, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { defineStore } from 'pinia'
 
 interface User {
@@ -12,16 +12,20 @@ export const useUserStore = defineStore('user', () => {
 	const user = ref<User | null>(null);
 	const isAuthenticated = ref<boolean>(false);
 	
-	// Computeds
+	// Getters (computeds)
 
 
 	// Watchers
 	watch(user, () => user.value ? isAuthenticated.value = true : isAuthenticated.value = false);
 
-	// Functions
+	// Actions
 	function login() {
 		user.value = { _id: "1356Dgfhtx566", pseudo: "Florian02", admin: false };
 	}
 
-	return { user, isAuthenticated, login };
+	return { 
+		user, 
+		isAuthenticated,
+		login 
+	};
 });

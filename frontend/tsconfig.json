@@ -2,6 +2,13 @@
   "extends": "@vue/tsconfig/tsconfig.web.json",
   "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
   "compilerOptions": {
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]

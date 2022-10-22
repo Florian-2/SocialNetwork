@@ -1,16 +1,12 @@
-<script setup lang="ts">
-import { RouterLink, RouterView } from "vue-router"
-import { useUserStore } from "./stores/user"
-
-const userStore = useUserStore();
+<script lang="ts" setup>
+import { RouterView } from "vue-router"
+import TheHeader from "./layouts/TheHeader.vue"
 </script>
 
 <template>
-	<header>
-		<h1>{{ userStore.user }}</h1>
-		<h1>{{ userStore.isAuthenticated }}</h1>
-		<button @click="userStore.login">login</button>
-	</header>
+	<TheHeader/>
 
-	<RouterView />
+	<main>
+		<RouterView />
+	</main>
 </template>
