@@ -1,10 +1,10 @@
 import { Router, Request, Response, NextFunction } from 'express';
+import Auth from "@/middleware/authenticated.middleware";
+import { register, login } from '@/resources/user/user.validation';
+import UserService from '@/resources/user/user.service';
 import Controller from '@/utils/interfaces/controller.interface';
 import HttpException from '@/utils/exceptions/http.exception';
 import validationFormData from '@/middleware/validation.middleware';
-import { register, login } from '@/resources/user/user.validation';
-import UserService from '@/resources/user/user.service';
-import Auth from "@/middleware/authenticated.middleware";
 
 class UserController implements Controller {
     public path = '/users';
@@ -23,9 +23,7 @@ class UserController implements Controller {
 
     private async register(req: Request, res: Response, next: NextFunction) {
         try {
-            const { pseudo, email, password, language } = req.body;
-
-            const result = await this.UserService.register(pseudo, email, password, language);
+            const result = await this.UserService.register(req.body);
             
             res.cookie("accessToken", result.accessToken, {
                 httpOnly: true,

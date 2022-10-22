@@ -6,9 +6,9 @@ import token from '@/utils/token';
 
 
 class UserService {
-    public async register(pseudo: string, email: string, password: string, language: string): Promise<{ user: User, accessToken: string }> {
+    public async register(body: User): Promise<{ user: User, accessToken: string }> {
         try {
-            const userWithPassword = await UserModel.create({ pseudo, email, password, language });
+            const userWithPassword = await UserModel.create(body);
             const user = await this.getUserById(userWithPassword.id, { withPassword: false });
 
             const accessToken = token.createToken(user);
@@ -40,11 +40,11 @@ class UserService {
         }
     }
 
-    public async getUserByEmail(email: string, option: { withPassword: boolean }): Promise<User> {
+    public async getUserByEmail(email: string, option?: { withPassword: boolean }): Promise<User> {
         try {
             let user: User | null = null;
 
-            if (option.withPassword) {
+            if (option?.withPassword) {
                 user = await UserModel.findOne({ email });
             } else {
                 user = await UserModel.findOne({ email }, { password: 0, __v: 0 });
@@ -53,7 +53,7 @@ class UserService {
             if (!user) {
                 throw new Error("Utilisateur introuvable");
             }
-            
+
             return user;
         }
         catch (error: any) {
