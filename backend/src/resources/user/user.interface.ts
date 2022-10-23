@@ -1,4 +1,7 @@
-import { Document } from 'mongoose';
+import { Document, Schema } from 'mongoose';
+
+
+export type UserID = Schema.Types.ObjectId;
 
 export default interface User extends Document {
     pseudo: string; 

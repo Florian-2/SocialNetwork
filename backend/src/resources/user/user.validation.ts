@@ -1,5 +1,5 @@
 import { z } from "zod";
-import UserService from "@/resources/user/user.service";
+import UserService from "./user.service";
 
 export const register = z.object({
     pseudo: z.string().min(2).max(50),

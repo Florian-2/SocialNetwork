@@ -1,7 +1,7 @@
 import { ObjectId } from "mongoose";
 import bcrypt from "bcrypt";
-import UserModel from '@/resources/user/user.model';
-import User from '@/resources/user/user.interface';
+import UserModel from './user.model';
+import User from './user.interface';
 import token from '@/utils/token';
 
 
