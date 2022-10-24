@@ -1,5 +1,8 @@
+import CommentModel from "@/resources/comment/comment.model";
+import { CreateComment } from "@/resources/comment/comment.interface"
 import { CreatePost, PostDocument, PostID } from "./post.interface";
 import PostModel from "./post.model";
+// import LikeModel from "@/resources/likes/like.model";
 
 
 class PostService {
@@ -13,11 +16,28 @@ class PostService {
         }
     }
 
+    public async createComment(postId: string, body: CreateComment)  {
+        try {
+            const postIsExist = await PostModel.exists({ _id: postId });
+
+            if (!postIsExist) {               
+                throw new Error("Le post sur lequel vous essayez d'ajouter un commentaire n'existe pas");
+            }
+
+            const comment = await CommentModel.create(body);
+            return comment;
+        } 
+        catch (error: any) {
+            console.log(error);
+            throw error;
+        }
+    }
+
     public async deletePost(postID: string, userID: string): Promise<PostID> {
         try {
             const post = await this.getOnePost(postID);
 
-            if (!(String(post.author) === userID)) {
+            if (!(String(post.author_id) === userID)) {
                 throw new Error();
             }
 
@@ -30,7 +50,7 @@ class PostService {
         }
     }
 
-    private async getOnePost(postID: string): Promise<PostDocument> {
+    public async getOnePost(postID: string): Promise<PostDocument> {
         try {
             const post = await PostModel.findOne({ _id: postID }, { __v: 0 });
 
@@ -44,6 +64,27 @@ class PostService {
             throw error;
         }
     }
+
+    // public async likePost(postID: string, userID: string) {
+    //     try {
+    //         const likeDoc = await LikeModel.findOne({ post_id: postID });
+            
+    //         if (likeDoc) {
+    //             console.log("unlike");
+    //             await LikeModel.deleteOne({ post_id: postID });
+    //         }
+    //         else {
+    //             console.log("like");
+    //             await LikeModel.create({
+    //                 post_id: postID,
+    //                 author_id: userID
+    //             });
+    //         }
+    //     } 
+    //     catch (error) {
+    //         throw error;
+    //     }
+    // }
 }
 
 export default PostService;

@@ -1,11 +1,14 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { isAuthenticated } from "@/middleware/authenticated.middleware";
+import { createPost } from "@/resources/post/post.validation"
 import { uploadFile } from "@/middleware/uploadFile.middleware";
+import validationFormData from '@/middleware/validation.middleware';
 import HttpException from "@/utils/exceptions/http.exception";
 import Controller from "@/utils/interfaces/controller.interface";
 import { UserID } from "@/resources/user/user.interface";
 import { Image } from "./post.interface";
 import PostServices from "./post.service";
+import { createComment } from "@/resources/comment/comment.validation";
 
 
 class PostController implements Controller {
@@ -18,27 +21,37 @@ class PostController implements Controller {
     }
 
     private initialiseRoutes(): void {       
-        this.router.post(`${this.path}/create`, isAuthenticated, uploadFile ,this.createPost.bind(this));
+        this.router.post(`${this.path}/create`, isAuthenticated, uploadFile, validationFormData(createPost), this.createPost.bind(this));
+        this.router.post(`${this.path}/create/comment/:id`, isAuthenticated, uploadFile, validationFormData(createComment), this.createComment.bind(this));
         this.router.delete(`${this.path}/delete/:id`, isAuthenticated, this.deletePost.bind(this));
+        // this.router.post(`${this.path}/like/:id`, isAuthenticated, this.likePost.bind(this));
+    }
+
+    private formatImgFile(req: Request): Image[] | undefined {
+        const files: Image[] = [];
+                    
+        if (Array.isArray(req.files)) {
+            req.files.forEach((file) => {
+                files.push({
+                    filename: file.filename,
+                    path: file.path,
+                    size: file.size
+                });
+            })
+    
+            return files;
+        }
+    
+        return;
     }
 
     private async createPost(req: Request, res: Response, next: NextFunction) {
         try {
-            const files: Image[] = [];
-            
-            if (Array.isArray(req.files)) {
-                req.files.forEach((file) => {
-                    files.push({
-                        filename: file.filename,
-                        path: file.path,
-                        size: file.size
-                    });
-                })
-            }
+            const files = this.formatImgFile(req);
 
             const post = await this.PostServices.createPost({
                 message: req.body.message as string,
-                author: req.user._id as UserID,
+                author_id: req.user._id as UserID,
                 images: files
             });
 
@@ -49,16 +62,54 @@ class PostController implements Controller {
         }
     }
 
-    private async deletePost(req: Request, res: Response, next: NextFunction) {
+    private async createComment(req: Request, res: Response, next: NextFunction) {
         try {
-            const postID = await this.PostServices.deletePost(req.params.id, req.user.id);
+            const files = this.formatImgFile(req);
+            const postId = req.params.id;
 
-            res.status(200).json({ id: postID });
+            if (!postId) {
+                throw new Error("Le post sur lequel vous essayez d'ajouter un commentaire n'existe pas");
+            }
+
+            const comment = await this.PostServices.createComment(postId, {
+                message: req.body.message as string,
+                author_id: req.user._id as UserID,
+                post_id: postId,
+                images: files
+            });
+            
+            res.status(201).json(comment);
         } 
         catch (error: any) {
             next(new HttpException(400, error.message));
         }
     }
+
+    private async deletePost(req: Request, res: Response, next: NextFunction) {
+        try {
+            const postId = await this.PostServices.deletePost(req.params.id, req.user.id);
+
+            res.status(200).json({ id: postId });
+        } 
+        catch (error: any) {
+            next(new HttpException(400, error.message));
+        }
+    }
+
+    // private async likePost(req: Request, res: Response, next: NextFunction) {
+    //     try {
+    //         const postId = req.params.id;
+
+    //         if (postId) {
+    //             await this.PostServices.likePost(postId, req.user.id);
+    //         }
+            
+    //         res.end();
+    //     } 
+    //     catch (error: any) {
+    //         next(new HttpException(400, error.message));
+    //     }
+    // }
 }
 
 export default PostController;

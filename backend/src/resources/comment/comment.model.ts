@@ -1,8 +1,8 @@
 import { Schema, model } from 'mongoose';
-import { PostDocument } from './post.interface';
+import { CommentDocument } from './comment.interface';
 
 
-const PostSchema = new Schema({
+const CommentSchema = new Schema({
     message: {
         type: String,
         required: [true, "Message requis"],
@@ -18,7 +18,12 @@ const PostSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "users",
         required: true
+    },
+    post_id: {
+        type: Schema.Types.ObjectId,
+        ref: "posts",
+        required: true
     }
 }, { timestamps: true });
 
-export default model<PostDocument>('posts', PostSchema);
+export default model<CommentDocument>('comments', CommentSchema);

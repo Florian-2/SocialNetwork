@@ -12,11 +12,11 @@ export interface Image {
 export interface PostDocument extends Document {
     message: string;
     images?: Image[]; 
-    author: Schema.Types.ObjectId;
+    author_id: Schema.Types.ObjectId;
 }
 
 export interface CreatePost {
     message: string;
     images?: Image[];
-    author: Schema.Types.ObjectId;
+    author_id: Schema.Types.ObjectId;
 }
