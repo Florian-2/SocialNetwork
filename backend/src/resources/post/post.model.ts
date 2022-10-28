@@ -18,7 +18,16 @@ const PostSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "users",
         required: true
+    },
+    comments: { 
+        type: [Schema.Types.ObjectId], 
+        ref: "comments" 
+    },
+    likers: { 
+        type: [Schema.Types.ObjectId],
+        require: true
     }
+
 }, { timestamps: true });
 
 export default model<PostDocument>('posts', PostSchema);

@@ -7,6 +7,7 @@ import helmet from "helmet";
 import cookieParser from 'cookie-parser';
 import Controller from '@/utils/interfaces/controller.interface';
 import ErrorMiddleware from "@/middleware/error.middleware";
+import path from 'path';
 
 class App {
 	public express: Application;
@@ -29,6 +30,7 @@ class App {
 		this.express.use(morgan('dev'));
 		this.express.use(express.json());
 		this.express.use(express.urlencoded({ extended: false }));
+		this.express.use(express.static(path.join(__dirname, "upload")));
 		this.express.use(compression());
 	}
 

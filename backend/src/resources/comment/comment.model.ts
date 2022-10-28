@@ -14,15 +14,9 @@ const CommentSchema = new Schema({
         maxlength: 2,
         required: false,
     },
-    author_id: {
-        type: Schema.Types.ObjectId,
-        ref: "users",
-        required: true
-    },
-    post_id: {
-        type: Schema.Types.ObjectId,
-        ref: "posts",
-        required: true
+    author: {
+        type: String,
+        require: true
     }
 }, { timestamps: true });
 

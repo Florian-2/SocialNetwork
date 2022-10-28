@@ -4,7 +4,7 @@ import { ZodError, ZodSchema } from "zod";
 function validationFormData(schema: ZodSchema): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            console.log(req.body);
+            // console.log(req.body);
             
             await schema.parseAsync(req.body);
             next();

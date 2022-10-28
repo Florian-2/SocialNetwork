@@ -5,6 +5,7 @@ import User from './user.interface';
 const UserSchema = new Schema<User>({
     pseudo: {
         type: String,
+        unique: true,
         required: true,
     },
     email: {

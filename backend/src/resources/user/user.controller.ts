@@ -21,6 +21,9 @@ class UserController implements Controller {
             return next(new HttpException(404, "Vous n'êtes pas connecté"));
         }
 
+        delete req.user.password;
+        delete req.user.__v;
+
         res.status(200).send(req.user);
     };
 }

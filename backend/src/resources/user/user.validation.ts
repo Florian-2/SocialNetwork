@@ -7,14 +7,15 @@ export const register = z.object({
     language: z.string().min(2),
     password: z.string().min(8),
     confirmPassword: z.string()
-}).refine((data) => data.password === data.confirmPassword, {
+})
+.refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],
     message: "La confirmation du mot de passe a échoué"
-}).refine(async (data) => {
+})
+.refine(async (data) => {
     try {
         const userService = new UserService();
-        await userService.getUserByEmail(data.email);
-        return false; // L'utilisateur existe déjà
+        return !(await userService.userExist("email", data.email)); // L'utilisateur existe déjà
     } 
     catch (error) {
         return true; // L'utilisateur n'existe pas encore donc c'est OK
@@ -22,6 +23,18 @@ export const register = z.object({
 }, {
     path: ["email"],
     message: "Adresse mail déjà utilisée"
+})
+.refine(async (data) => {
+    try {
+        const userService = new UserService();
+        return !(await userService.userExist("pseudo", data.pseudo)); // L'utilisateur existe déjà
+    } 
+    catch (error) {
+        return true; // L'utilisateur n'existe pas encore donc c'est OK
+    }
+}, {
+    path: ["pseudo"],
+    message: "Pseudo déjà utilisée"
 });
 
 
