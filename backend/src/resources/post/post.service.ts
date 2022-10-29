@@ -2,6 +2,7 @@ import PostModel from "./post.model";
 import CommentModel from "@/resources/comment/comment.model";
 import { CreateComment } from "@/resources/comment/comment.interface"
 import { CreatePost, PostDocument, PostID } from "./post.interface";
+import fs from "fs/promises";
 // import LikeModel from "@/resources/likes/like.model";
 
 
@@ -37,12 +38,11 @@ class PostService {
 
     public async getAllPosts(page: number, limit: number) {
         try {
-            const posts = await PostModel.find()
-                                                .select("-__v")
-                                                .populate("author_id", { password: 0, __v: 0 })
-                                                .populate("comments", { __v: 0 })
-                                                .skip((page - 1) * limit)
-                                                .limit(limit * 1)
+            const posts = await PostModel.find({}, { __v: 0 })
+                                                    .populate("author_id", { password: 0, __v: 0 })
+                                                    .populate("comments", { __v: 0 })
+                                                    .skip((page - 1) * limit)
+                                                    .limit(limit * 1)
                                 
             const countPosts = await PostModel.countDocuments();           
 
@@ -110,17 +110,21 @@ class PostService {
 
     public async deletePost(postID: string, userID: string): Promise<PostID> {
         try {
-            const post = await this.getOnePost(postID);
-
+            const [post] = await Promise.all([this.getOnePost(postID), PostModel.deleteOne({ _id: postID })]);
+            
             if (!(String(post.author_id) === userID)) {
                 throw new Error();
             }
 
-            PostModel.deleteOne({ _id: postID });
+            if (post.images && post.images.length > 0) {
+                for (const file of post.images) {
+                    await fs.unlink(`${file.absolutePath}`).catch((err) => console.log(err));
+                }
+            }
 
             return post._id;
         } 
-        catch (error: any) {           
+        catch (error: any) {
             throw new Error("Une erreur est survenue lors de la tentative de suppression du post");
         }
     }

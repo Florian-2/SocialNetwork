@@ -6,6 +6,7 @@ export type PostID = Schema.Types.ObjectId;
 export interface Image {
     filename: string,
     path: string,
+    absolutePath: string,
     size: number
 }
 
