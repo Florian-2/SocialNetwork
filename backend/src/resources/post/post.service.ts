@@ -3,6 +3,7 @@ import CommentModel from "@/resources/comment/comment.model";
 import { CreateComment } from "@/resources/comment/comment.interface"
 import { CreatePost, PostDocument, PostID } from "./post.interface";
 import fs from "fs/promises";
+import { deleteManyFiles } from "@/utils/features/files";
 // import LikeModel from "@/resources/likes/like.model";
 
 
@@ -116,16 +117,23 @@ class PostService {
                 throw new Error();
             }
 
-            if (post.images && post.images.length > 0) {
-                for (const file of post.images) {
-                    await fs.unlink(`${file.absolutePath}`).catch((err) => console.log(err));
-                }
+            if (post.images) {
+                await Promise.all(deleteManyFiles(post.images));
             }
 
             return post._id;
         } 
         catch (error: any) {
             throw new Error("Une erreur est survenue lors de la tentative de suppression du post");
+        }
+    }
+
+    public async deleteComment(_commentID: string, _userID: string) {
+        try {
+          
+        } 
+        catch (error: any) {
+            throw new Error("Une erreur est survenue lors de la tentative de suppression du commentaire");
         }
     }
 

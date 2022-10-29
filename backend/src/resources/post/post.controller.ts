@@ -28,6 +28,7 @@ class PostController implements Controller {
 
         this.router.get(`${this.path}/get-all`, isAuthenticated, this.getAllPosts.bind(this));
         this.router.delete(`${this.path}/delete/:id`, isAuthenticated, this.deletePost.bind(this));
+        this.router.delete(`${this.path}/delete/comment/:id`, isAuthenticated, this.deleteComment.bind(this));
         // this.router.post(`${this.path}/like/:id`, isAuthenticated, this.likePost.bind(this));
     }
 
@@ -129,6 +130,17 @@ class PostController implements Controller {
     private async deletePost(req: Request, res: Response, next: NextFunction) {
         try {
             const postId = await this.PostServices.deletePost(req.params.id, req.user.id);
+
+            res.status(200).json({ id: postId });
+        } 
+        catch (error: any) {
+            next(new HttpException(400, error.message));
+        }
+    }
+
+    private async deleteComment(req: Request, res: Response, next: NextFunction) {
+        try {
+            const postId = await this.PostServices.deleteComment(req.params.id, req.user.id);
 
             res.status(200).json({ id: postId });
         } 
