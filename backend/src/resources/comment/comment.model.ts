@@ -15,8 +15,14 @@ const CommentSchema = new Schema({
         required: false,
     },
     author: {
-        type: String,
-        require: true
+        id: {
+            type: Schema.Types.ObjectId,
+            required: true,
+        },
+        pseudo: {
+            type: String,
+            required: true
+        }
     }
 }, { timestamps: true });
 

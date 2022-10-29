@@ -75,7 +75,7 @@ class PostController implements Controller {
 
             const comment = await this.PostServices.createComment(postId, {
                 message: req.body.message as string,
-                author: req.user.pseudo,
+                author: { id: req.user._id, pseudo: req.user.pseudo },
                 images: files
             });
             
@@ -140,9 +140,9 @@ class PostController implements Controller {
 
     private async deleteComment(req: Request, res: Response, next: NextFunction) {
         try {
-            const postId = await this.PostServices.deleteComment(req.params.id, req.user.id);
+            const commentId = await this.PostServices.deleteComment(req.params.id, req.user.id);
 
-            res.status(200).json({ id: postId });
+            res.status(200).json({ id: commentId });
         } 
         catch (error: any) {
             next(new HttpException(400, error.message));

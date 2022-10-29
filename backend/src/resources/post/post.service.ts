@@ -1,8 +1,7 @@
 import PostModel from "./post.model";
-import CommentModel from "@/resources/comment/comment.model";
-import { CreateComment } from "@/resources/comment/comment.interface"
 import { CreatePost, PostDocument, PostID } from "./post.interface";
-import fs from "fs/promises";
+import CommentModel from "@/resources/comment/comment.model";
+import { CommentDocument, CommentID, CreateComment } from "@/resources/comment/comment.interface"
 import { deleteManyFiles } from "@/utils/features/files";
 // import LikeModel from "@/resources/likes/like.model";
 
@@ -72,6 +71,21 @@ class PostService {
             throw error;
         }
     }
+
+    public async getOneComment(commentID: string): Promise<CommentDocument> {
+        try {
+            const comment = await CommentModel.findOne({ _id: commentID }, { __v: 0 });
+
+            if (!comment) {
+                throw new Error("Commentaire introuvable");
+            }
+
+            return comment;
+        } 
+        catch (error) {
+            throw error;
+        }
+    }
     
     public async updateTextPost(postID: string, userID: string, editedMessage: string) {
         try {
@@ -111,15 +125,18 @@ class PostService {
 
     public async deletePost(postID: string, userID: string): Promise<PostID> {
         try {
-            const [post] = await Promise.all([this.getOnePost(postID), PostModel.deleteOne({ _id: postID })]);
+            const post = await this.getOnePost(postID);
             
             if (!(String(post.author_id) === userID)) {
                 throw new Error();
             }
-
-            if (post.images) {
-                await Promise.all(deleteManyFiles(post.images));
-            }
+            
+            // Suppresion des fichiers (pièce jointe) si besoin ET suppression du post et de ses commentaires
+            await Promise.all([
+                post.images && deleteManyFiles(post.images), 
+                PostModel.deleteOne({ _id: postID }),
+                CommentModel.deleteMany({ _id: { $in: post.comments } })
+            ]);
 
             return post._id;
         } 
@@ -128,11 +145,23 @@ class PostService {
         }
     }
 
-    public async deleteComment(_commentID: string, _userID: string) {
+    public async deleteComment(commentID: string, userID: string): Promise<CommentID> {
         try {
-          
+            const comment = await this.getOneComment(commentID);
+            
+            if (!(String(comment.author.id) === userID)) {                
+                throw new Error();
+            }
+
+            await Promise.all([
+                comment.images && deleteManyFiles(comment.images), 
+                CommentModel.deleteOne({ _id: commentID }),
+                PostModel.updateOne({ $pull: { comments: commentID } })
+            ]);
+
+            return comment._id;
         } 
-        catch (error: any) {
+        catch (error: any) {           
             throw new Error("Une erreur est survenue lors de la tentative de suppression du commentaire");
         }
     }
