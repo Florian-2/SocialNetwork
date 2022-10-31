@@ -12,7 +12,7 @@ class PostService {
             const post = await PostModel.create(body);
             return post;
         } 
-        catch (error: any) {
+        catch (error: any) {           
             throw new Error("Une erreur est survenue lors de la création du post");
         }
     }
@@ -25,8 +25,7 @@ class PostService {
                 throw new Error("Le post sur lequel vous essayez d'ajouter un commentaire n'existe pas");
             }
 
-            const comment = await CommentModel.create(body);
-            await PostModel.updateOne({ _id: postId }, { $push: { comments: comment._id } });
+            const comment = await CommentModel.create({ ...body, post_id: postId });
 
             return comment;
         } 
@@ -36,15 +35,14 @@ class PostService {
         }
     }
 
-    public async getAllPosts(page: number, limit: number) {
+    public async getManyPosts(page: number, limit: number) {
         try {
             const posts = await PostModel.find({}, { __v: 0 })
                                                     .populate("author_id", { password: 0, __v: 0 })
-                                                    .populate("comments", { __v: 0 })
                                                     .skip((page - 1) * limit)
                                                     .limit(limit * 1)
                                 
-            const countPosts = await PostModel.countDocuments();           
+            const countPosts = await PostModel.countDocuments();
 
             if (!posts) {
                 throw new Error("Aucun posts");
@@ -81,6 +79,24 @@ class PostService {
             }
 
             return comment;
+        } 
+        catch (error) {
+            throw error;
+        }
+    }
+
+    public async getManyComments(postID: string, page: number, limit: number) {
+        try {
+            const [comments, countComments] = await Promise.all([
+                CommentModel.find({ post_id: postID }, { __v: 0 }).skip((page - 1) * limit).limit(limit * 1), 
+                CommentModel.countDocuments()
+            ]); 
+
+            if (!comments) {
+                throw new Error("Aucun commentaire");
+            }
+            
+            return { comments, countComments };
         } 
         catch (error) {
             throw error;
@@ -135,7 +151,7 @@ class PostService {
             await Promise.all([
                 post.images && deleteManyFiles(post.images), 
                 PostModel.deleteOne({ _id: postID }),
-                CommentModel.deleteMany({ _id: { $in: post.comments } })
+                CommentModel.deleteMany({ post_id: postID })
             ]);
 
             return post._id;
@@ -149,19 +165,18 @@ class PostService {
         try {
             const comment = await this.getOneComment(commentID);
             
-            if (!(String(comment.author.id) === userID)) {                
+            if (!(String(comment.author.id) === userID)) { 
                 throw new Error();
             }
 
             await Promise.all([
                 comment.images && deleteManyFiles(comment.images), 
-                CommentModel.deleteOne({ _id: commentID }),
-                PostModel.updateOne({ $pull: { comments: commentID } })
+                CommentModel.deleteOne({ _id: commentID })
             ]);
 
             return comment._id;
         } 
-        catch (error: any) {           
+        catch (error: any) {
             throw new Error("Une erreur est survenue lors de la tentative de suppression du commentaire");
         }
     }

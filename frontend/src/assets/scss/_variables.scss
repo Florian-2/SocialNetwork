@@ -1,0 +1,26 @@
+:root {
+    // ----------- COLOR ----------- \\
+    --color-white: #ffffff;
+    --color-white-2: #e8e8e8;
+
+    --color-black: #000000;
+    --color-black-2: #282828;
+
+    // --color-divider-light: rgba(198, 198, 198, 0.20);
+    // --color-divider-dark: rgba(232, 232, 232, 0.20);
+
+    --color-primary: hsl(225, 72%, 56%); // royalblue
+
+    --color-text-light: --color-black;
+    --color-text-dark: --color-white;
+
+
+    // ----------- TYPO ----------- \\
+    --font-familly: Arial, Helvetica, sans-serif;
+    // 'Poppins', sans-serif;
+
+    
+    // ----------- OTHER ----------- \\
+    --transition-time: 250ms;
+    --raduis: 5px;
+}

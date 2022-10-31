@@ -8,4 +8,5 @@ export default interface User extends Document {
     language: string;
     email: string;
     password?: string;
+    admin: boolean;
 }

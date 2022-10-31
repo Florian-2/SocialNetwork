@@ -6,21 +6,26 @@ const UserSchema = new Schema<User>({
     pseudo: {
         type: String,
         unique: true,
-        required: true,
+        required: true
     },
     email: {
         type: String,
         required: true,
         unique: true,
-        trim: true,
+        trim: true
     },
     password: {
         type: String,
-        required: true,
+        required: true
     },
     language: {
         type: String,
         require: true
+    },
+    admin: {
+        type: Boolean,
+        require: false,
+        default: false
     }
 }, { timestamps: true });
 

@@ -1,3 +1,27 @@
 {
-    
+    "title_page": {
+        "login": "Login",
+        "register": "Register"
+    },
+    "form": {
+        "label": {
+            "pseudo": "Username",
+            "email": "Adress email",
+            "password": "Password",
+            "confirmPassword": "Confirmation of the password"
+        },
+        "error": {
+            "pseudo_require": "Username required",
+            "pseudo": "3 characters minimum",
+
+            "email_require": "Adress email required",
+            "email": "Incorrect format of the email address",
+
+            "password_require": "Password required",
+            "password": "The password must contain at least 8 characters",
+
+            "confirmPassword_require": "Confirmation of the password required",
+            "confirmPassword": "Passwords don't match"
+        }
+    }
 }

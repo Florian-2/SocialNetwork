@@ -14,6 +14,10 @@ const CommentSchema = new Schema({
         maxlength: 2,
         required: false,
     },
+    post_id: {
+        type: Schema.Types.ObjectId,
+        required: true,
+    },
     author: {
         id: {
             type: Schema.Types.ObjectId,
@@ -23,6 +27,16 @@ const CommentSchema = new Schema({
             type: String,
             required: true
         }
+    },
+    likesCounter: {
+        type: Number,
+        require: false,
+        default: 0
+    },
+    iHaveLiked: {
+        type: String,
+        require: false,
+        default: ""
     }
 }, { timestamps: true });
 

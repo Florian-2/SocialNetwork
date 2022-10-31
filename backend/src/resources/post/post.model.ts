@@ -19,15 +19,16 @@ const PostSchema = new Schema({
         ref: "users",
         required: true
     },
-    comments: { 
-        type: [Schema.Types.ObjectId], 
-        ref: "comments" 
+    likesCounter: {
+        type: Number,
+        require: false,
+        default: 0
     },
-    likers: { 
-        type: [Schema.Types.ObjectId],
-        require: true
+    iHaveLiked: {
+        type: String,
+        require: false,
+        default: ""
     }
-
 }, { timestamps: true });
 
 export default model<PostDocument>('posts', PostSchema);

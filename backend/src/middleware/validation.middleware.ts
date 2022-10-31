@@ -11,13 +11,10 @@ function validationFormData(schema: ZodSchema): RequestHandler {
         } 
         catch (e) {
             const err = e as ZodError;
-            const formatZodError: { field: string, message: string }[] = [];
+            const formatZodError: { [key: string]: string } = {};
 
             for (const e of err.issues) {
-                formatZodError.push({
-                    field: e.path[0] as string,
-                    message: e.message
-                });
+                formatZodError[e.path[0]] = e.message
             }
                       
             res.status(400).send({ errors: formatZodError });

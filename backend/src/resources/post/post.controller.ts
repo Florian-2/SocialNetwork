@@ -22,11 +22,12 @@ class PostController implements Controller {
 
     private initialiseRoutes(): void {       
         this.router.post(`${this.path}/create`, isAuthenticated, uploadFile, validationFormData(createPost), this.createPost.bind(this));
-        this.router.post(`${this.path}/create/comment/:id`, isAuthenticated, uploadFile, validationFormData(createComment), this.createComment.bind(this));
+        this.router.post(`${this.path}/:id/create/comment`, isAuthenticated, uploadFile, validationFormData(createComment), this.createComment.bind(this));
         this.router.patch(`${this.path}/update/text/:id`, isAuthenticated, validationFormData(createPost), this.updateTextPost.bind(this));
         // this.router.patch(`${this.path}/update/files/:id`, isAuthenticated, this.updateFilesPost.bind(this));
 
-        this.router.get(`${this.path}/get-all`, isAuthenticated, this.getAllPosts.bind(this));
+        this.router.get(`${this.path}`, isAuthenticated, this.getManyPosts.bind(this));
+        this.router.get(`${this.path}/:id/comments`, isAuthenticated, this.getManyComments.bind(this));
         this.router.delete(`${this.path}/delete/:id`, isAuthenticated, this.deletePost.bind(this));
         this.router.delete(`${this.path}/delete/comment/:id`, isAuthenticated, this.deleteComment.bind(this));
         // this.router.post(`${this.path}/like/:id`, isAuthenticated, this.likePost.bind(this));
@@ -56,7 +57,7 @@ class PostController implements Controller {
             const files = this.formatImgFile(req);
 
             const post = await this.PostServices.createPost({
-                message: req.body.message as string,
+                message: req.body.message,
                 author_id: req.user._id as UserID,
                 images: files
             });
@@ -74,8 +75,8 @@ class PostController implements Controller {
             const postId = req.params.id;
 
             const comment = await this.PostServices.createComment(postId, {
-                message: req.body.message as string,
-                author: { id: req.user._id, pseudo: req.user.pseudo },
+                message: req.body.message,
+                author: { id: req.user._id as UserID, pseudo: req.user.pseudo },
                 images: files
             });
             
@@ -86,16 +87,35 @@ class PostController implements Controller {
         }
     }
 
-    private async getAllPosts(req: Request, res: Response, next: NextFunction) {
+    private async getManyPosts(req: Request, res: Response, next: NextFunction) {
         try {
-            const page = Number(req.query.page);
-            const limit = Number(req.query.limit as string);
+            const page = req.query.page ? Number(req.query.page) : 1;
+            const limit = req.query.limit ? Number(req.query.limit) : 5;
             
-            const { posts, countPosts } = await this.PostServices.getAllPosts(page, limit);
+            const { posts, countPosts } = await this.PostServices.getManyPosts(page, limit);
 
             res.status(200).json({
                 posts,
                 totalPages: Math.ceil(countPosts / limit),
+                currentPage: page
+            });
+        } 
+        catch (error: any) {
+            next(new HttpException(400, error.message));
+        }
+    }
+
+    private async getManyComments(req: Request, res: Response, next: NextFunction) {
+        try {
+            const postId = req.params.id;
+            const page = req.query.page ? Number(req.query.page) : 1;
+            const limit = req.query.limit ? Number(req.query.limit) : 5;
+            
+            const { comments, countComments } = await this.PostServices.getManyComments(postId, page, limit);
+
+            res.status(200).json({
+                comments,
+                totalPages: Math.ceil(countComments / limit),
                 currentPage: page
             });
         } 

@@ -1,0 +1,11 @@
+@import "./variables";
+
+:root {
+    --t-color-background: var(--color-white);
+    --t-color-text: var(--color-black-2);
+}
+
+:root.dark {
+    --t-color-background: var(--color-black);
+    --t-color-text: var(--color-text-dark);
+}

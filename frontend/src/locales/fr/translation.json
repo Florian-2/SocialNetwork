@@ -1,3 +1,27 @@
 {
-    
+    "title_page": {
+        "login": "Connexion",
+        "register": "Inscription"
+    },
+    "form": {
+        "label": {
+            "pseudo": "Nom d'utilisateur",
+            "email": "Adresse email",
+            "password": "Mot de passe",
+            "confirmPassword": "Confirmation du mot de passe"
+        },
+        "error": {
+            "pseudo_require": "Nom d'utilisateur requis",
+            "pseudo": "3 caractères minimum",
+
+            "email_require": "Adresse email requise",
+            "email": "Format de l'adresse email incorrect",
+
+            "password_require": "Le mot de passe requis",
+            "password": "Le mot de passe doit contenir aux moins 8 caractères",
+
+            "confirmPassword_require": "Confirmation du mot de passe requise",
+            "confirmPassword": "Les mots de passe ne correspondent pas"
+        }
+    }
 }

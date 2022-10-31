@@ -1,31 +1,46 @@
-import { ref, computed, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
+import { detectedLanguage } from '@/i18n'
+import AuthServices from '../services/auth.services';
 
-interface User {
-	_id: string;
-	pseudo: string;
-	admin: boolean;
-}
+import type { LoginUserForm, RegisterUserForm, User } from '../interfaces/user.interface';
+
 
 export const useUserStore = defineStore('user', () => {
 	// State
-	const user = ref<User | null>(null);
+	const currentUser = ref<User | null>(null);
 	const isAuthenticated = ref<boolean>(false);
 	
 	// Getters (computeds)
-
+	
 
 	// Watchers
-	watch(user, () => user.value ? isAuthenticated.value = true : isAuthenticated.value = false);
+	watch(currentUser, () => currentUser.value ? isAuthenticated.value = true : isAuthenticated.value = false);
 
 	// Actions
-	function login() {
-		user.value = { _id: "1356Dgfhtx566", pseudo: "Florian02", admin: false };
+	async function register(formaData: RegisterUserForm) {
+		try {
+			const user = await AuthServices.register({ ...formaData, language: detectedLanguage });
+			currentUser.value = user;
+		} 
+		catch (error) {
+			throw error;
+		}
+	}
+
+	async function login(formaData: LoginUserForm) {
+		try {
+
+		} 
+		catch (error) {
+			
+		}
 	}
 
 	return { 
-		user, 
+		currentUser, 
 		isAuthenticated,
+		register,
 		login 
 	};
 });

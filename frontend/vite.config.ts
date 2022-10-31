@@ -12,6 +12,23 @@ export default defineConfig({
 		}
 	},
 	server: {
-		port: 3000
+		port: 3000,
+		proxy: {
+		  '/api': 'http://localhost:8000'
+		}
+	},
+	define: {
+		__VUE_I18N_FULL_INSTALL__: true,
+		__VUE_I18N_LEGACY_API__: false,
+		__INTLIFY_PROD_DEVTOOLS__: false
+	},
+	css: {
+		preprocessorOptions: {
+			scss: {
+				additionalData: `
+					@use "@/assets/scss/global.scss";
+				`
+			}
+		}
 	}
 })
