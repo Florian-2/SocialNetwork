@@ -1,17 +1,21 @@
 <script setup lang="ts">
-// import { ref } from "vue";
-import { z } from "zod";
-import { useField, useForm } from "vee-validate";
-import { toFormValidator } from "@vee-validate/zod";
-import { useI18n } from "vue-i18n";
+import { ref } from 'vue';
+import { z } from 'zod';
+import { useField, useForm } from 'vee-validate';
+import { toFormValidator } from '@vee-validate/zod';
+import { useI18n } from 'vue-i18n';
 import type { RegisterUserForm } from '../interfaces/user.interface';
-import { pseudo, email, passwordWithRules, confirmPassword } from "../validations/user.validators";
-import { useUserStore } from "@/resources/users/store/user";
+import { pseudo, email, passwordWithRules, confirmPassword } from '../validations/user.validators';
+import { useUserStore } from '@/resources/users/store/user';
 import { AxiosError } from 'axios'
+import IconEye from '@/components/icons/IconEye.vue';
+import IconEyeSlash from '@/components/icons/IconEyeSlash.vue';
+import Button from '@/components/ui/Button.vue';
 
 
 const { t } = useI18n();
 const userStore = useUserStore();
+const showPassword = ref(false);
 
 const validationSchema = toFormValidator(z.object({
     pseudo,
@@ -24,32 +28,37 @@ const validationSchema = toFormValidator(z.object({
     message: "form.error.confirmPassword" 
 }));
 
-const form = useForm<RegisterUserForm>({validationSchema});
+const form = useForm<RegisterUserForm>({
+    validationSchema,
+    // initialValues: {
+    //     pseudo: "_Flo_",
+    //     email: "florian@mail.com",
+    //     language: "fr",
+    //     password: "Florian2022",
+    //     confirmPassword: "Florian2022"
+    // }
+});
 
 const { 
     value: pseudoValue, 
     errorMessage: pseudoError, 
-    // meta: pseudoMeta, 
     handleChange: pseudoHandleChange, 
-} = useField<string>("pseudo", undefined, { initialValue: "_Flo_", validateOnValueUpdate: false });
+} = useField<string>("pseudo", undefined, { validateOnValueUpdate: false });
 const { 
     value: emailValue, 
     errorMessage: emailError, 
-    // meta: emailMeta,
     handleChange: emailHandleChange, 
-} = useField<string>("email", undefined, { initialValue: "florian@mail.com", validateOnValueUpdate: false });
+} = useField<string>("email", undefined, { validateOnValueUpdate: false });
 const { 
     value: passwordValue, 
     errorMessage: passwordError, 
-    // meta: passwordMeta,
     handleChange: passwordHandleChange, 
-} = useField<string>("password", undefined, { initialValue: "Florian2022", validateOnValueUpdate: false });
+} = useField<string>("password", undefined, { validateOnValueUpdate: false });
 const { 
     value: confirmPasswordValue, 
     errorMessage: confirmPasswordError, 
-    // meta: confirmPasswordwdMeta,
     handleChange: confirmPasswordHandleChange, 
-} = useField<string>("confirmPassword", undefined, { initialValue: "Florian2022", validateOnValueUpdate: false });
+} = useField<string>("confirmPassword", undefined, { validateOnValueUpdate: false });
 
 
 const onSubmit = form.handleSubmit(async (formData) => {       
@@ -59,77 +68,102 @@ const onSubmit = form.handleSubmit(async (formData) => {
     catch (e) {
         if (e instanceof AxiosError) {           
             const errors = e.response?.data?.errors;
-            
-            console.log(form.errors.value);
             form.setErrors({ ...errors });
-            console.log(form.errors.value);
-
-            // for (const err of errors) {
-            //     const field = err.field as string;
-            //     const message = err.field;
-            //     form.setErrors({ field: message });
-            // }
         }
     }
 });
+
+const handleShowPassword = (): boolean => showPassword.value = !showPassword.value;
 </script>
 
 <template>
-    <form @submit.prevent="onSubmit">
-        <div class="form-group">
-            <label for="pseudo">{{ t("form.label.pseudo") }}</label>
-            <input 
-                type="text"
-                v-model="pseudoValue" 
-                @change="pseudoHandleChange"
-                @blur="pseudoHandleChange"
-                id="pseudo" name="pseudo"
-            >
-            <small v-if="pseudoError">{{ t(pseudoError) }}</small>
+    <section class="form-container">
+        <div class="form-content">
+            <h1>{{ t("form.title.register") }}</h1>
+
+            <form @submit.prevent="onSubmit">
+                <div class="form-group">
+                    <label for="pseudo">{{ t("form.label.pseudo") }}</label>
+
+                    <div :class="['input-content', { 'error': pseudoError } ]">
+                        <input 
+                            type="text"
+                            v-model="pseudoValue" 
+                            @change="pseudoHandleChange"
+                            id="pseudo" name="pseudo"  
+                        >
+                    </div>
+                    
+                    <span class="error-message" v-if="pseudoError">{{ t(pseudoError) }}</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">{{ t("form.label.email") }}</label>
+
+                    <div :class="['input-content', { 'error': emailError }]">
+                        <input 
+                            type="email" 
+                            v-model="emailValue" 
+                            @change="emailHandleChange"
+                            id="email" name="email"      
+                        >
+                    </div>
+
+                    <span class="error-message" v-if="emailError">{{ t(emailError) }}</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">{{ t("form.label.password") }}</label>
+
+                    <div :class="['input-content', { 'error': passwordError }]">
+                        <input 
+                            :type="showPassword ? 'text' : 'password'"
+                            v-model="passwordValue" 
+                            @change="passwordHandleChange"
+                            id="password" name="password"
+                        >
+                        <span class="icon" @click="handleShowPassword">
+                            <IconEyeSlash v-if="showPassword"/>
+                            <IconEye v-else/>
+                        </span>
+                    </div>
+
+                    <span class="error-message" v-if="passwordError">{{ t(passwordError) }}</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">{{ t("form.label.confirmPassword") }}</label>
+
+                    <div :class="['input-content', { 'error': confirmPasswordError }]">
+                        <input 
+                            :type="showPassword ? 'text' : 'password'"
+                            v-model="confirmPasswordValue" 
+                            @change="confirmPasswordHandleChange"
+                            id="confirmPassword" name="confirmPassword"
+                        >
+                        <span class="icon" @click="handleShowPassword">
+                            <IconEyeSlash v-if="showPassword"/>
+                            <IconEye v-else/>
+                        </span>
+                    </div>
+
+                    <span class="error-message" v-if="confirmPasswordError">{{ t(confirmPasswordError) }}</span>
+                </div>
+
+                <Button @click="onSubmit" type="primary" :disabled="form.isSubmitting.value">Valider</Button>
+            </form>
+            
+            <p class="question-form">
+                Vous avez un compte ? 
+                <RouterLink to="Login">Connexion</RouterLink>
+            </p>
         </div>
 
-        <div class="form-group">
-            <label for="email">{{ t("form.label.email") }}</label>
-            <input 
-                type="email" 
-                v-model="emailValue" 
-                @change="emailHandleChange"
-                @blur="emailHandleChange"         
-                id="email" name="email"
-            >
-            <small v-if="emailError">{{ t(emailError) }}ERR</small>
+        <div class="title-content">
+            <div class="logo">
+                <h1>Hola</h1>
+                <div id="point"></div>
+            </div>
         </div>
-
-        <div class="form-group">
-            <label for="password">{{ t("form.label.password") }}</label>
-            <input 
-                type="text"
-                v-model="passwordValue" 
-                @change="passwordHandleChange" 
-                @blur="passwordHandleChange"      
-                id="password" name="password"
-            >
-            <small v-if="passwordError">{{ t(passwordError) }}ERR</small>
-        </div>
-
-        <div class="form-group">
-            <label for="confirmPassword">{{ t("form.label.confirmPassword") }}</label>
-            <input 
-                type="text" 
-                v-model="confirmPasswordValue" 
-                @change="confirmPasswordHandleChange" 
-                @blur="confirmPasswordHandleChange" 
-                id="confirmPassword" name="confirmPassword"
-            >
-            <small v-if="confirmPasswordError">{{ t(confirmPasswordError) }}</small>
-        </div>
-
-        <pre>{{ form.errors }}</pre>
-
-        <button @click="onSubmit" :disabled="form.isSubmitting.value">Valider</button>
-    </form>
+    </section>
 </template>
-
-<style scoped>
-
-</style>

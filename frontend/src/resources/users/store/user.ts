@@ -30,10 +30,11 @@ export const useUserStore = defineStore('user', () => {
 
 	async function login(formaData: LoginUserForm) {
 		try {
-
+			const user = await AuthServices.login(formaData);
+			currentUser.value = user;
 		} 
 		catch (error) {
-			
+			throw error;
 		}
 	}
 

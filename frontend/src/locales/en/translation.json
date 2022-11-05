@@ -4,6 +4,10 @@
         "register": "Register"
     },
     "form": {
+        "title": {
+            "login": "Login",
+            "register": "Register"
+        },
         "label": {
             "pseudo": "Username",
             "email": "Adress email",
@@ -12,10 +16,13 @@
         },
         "error": {
             "pseudo_require": "Username required",
-            "pseudo": "3 characters minimum",
+            "pseudo_min": "2 characters minimum",
+            "pseudo_max": "50 characters maximum",
+            "pseudo_already_used": "Pseudo already used",
 
             "email_require": "Adress email required",
             "email": "Incorrect format of the email address",
+            "email_already_used": "Adress email already used",
 
             "password_require": "Password required",
             "password": "The password must contain at least 8 characters",

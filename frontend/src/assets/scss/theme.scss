@@ -1,11 +1,25 @@
-@import "./variables";
+@use "./variables";
 
 :root {
-    --t-color-background: var(--color-white);
+    --t-color-background-1: var(--color-white-2);
+    --t-color-background-2: var(--color-white);
+
     --t-color-text: var(--color-black-2);
+    
+    --t-color-border: var(--colot-divider-light-1);
+    --t-color-border-focus: var(--color-divider-light-2);
+
+    // --t-color-input: var(--color-white-2);
 }
 
 :root.dark {
-    --t-color-background: var(--color-black);
+    --t-color-background-1: var(--color-black);
+    // --t-color-background-2: var(--color-white);
+    
+    --t-color-border: var(--colot-divider-dark-1);
+    --t-color-border-focus: var(--color-divider-dark-2);
+
     --t-color-text: var(--color-text-dark);
+    
+    // --t-color-input: var(--color-text-dark);
 }

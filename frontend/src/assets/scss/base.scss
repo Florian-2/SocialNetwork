@@ -1,7 +1,6 @@
 @use "./theme.scss";
 @use "./mixins";
 @use "./reset.scss";
-// @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;1,400&display=swap');
 
 html {
  	font-size: 62.5%;
@@ -9,5 +8,5 @@ html {
 
 body {
     font-family: var(--font-familly);
-    background: var(--t-color-background);
+    background: var(--t-color-background-1);
 }

@@ -16,7 +16,7 @@ export const userRoutes: RouteRecordRaw[] = [
         path: "/login",
         name: "Login",
         meta: {
-            title: `Hola. - ${translateTitle("title_page.login")}`
+            title: `Hola - ${translateTitle("title_page.login")}`
         },
         component: LoginView
     },
@@ -24,7 +24,7 @@ export const userRoutes: RouteRecordRaw[] = [
         path: "/register",
         name: "Register",
         meta: {
-            title: `Hola. - ${translateTitle("title_page.register")}`
+            title: `Hola - ${translateTitle("title_page.register")}`
         },
         component: () => import('@/views/RegisterView.vue')
     }

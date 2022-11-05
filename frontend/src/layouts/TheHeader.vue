@@ -15,9 +15,12 @@
 
 <style scoped lang="scss">
 header {
+	padding-inline: 5px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+	box-shadow: var(--shadow);
+    background-color: var(--t-color-background-2);
 }
 
 div.logo {
