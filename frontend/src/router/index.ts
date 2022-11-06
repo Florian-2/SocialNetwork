@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { postRoutes } from '@/resources/posts/routes';
 import { userRoutes } from '@/resources/users/routes';
+import { useUserStore } from '@/resources/users/store/user';
 
 
 const router = createRouter({
@@ -9,6 +10,13 @@ const router = createRouter({
 		...postRoutes,
 		...userRoutes
 	]
+});
+
+router.beforeEach(async () => {
+	const userStore = useUserStore();
+	if (!userStore.loaded) {
+		await userStore.fetchCurrentUser();
+	}
 });
 
 router.afterEach((to) => {

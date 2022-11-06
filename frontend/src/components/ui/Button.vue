@@ -1,23 +1,36 @@
 <script setup lang="ts">
 defineProps<{
     type?: "primary" | "danger";
+    isLoading?: boolean;
 }>();
 </script>
 
 <template>
     <button :class="type">
-        <slot>button</slot>
+        <span v-if="isLoading">Chargement...</span>
+        <span v-else>
+            <slot></slot>
+        </span>
     </button>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 button {
-    font-size: clamp(1.25rem, 2vw, 1.5rem);
     padding: 1rem;
+    font-size: clamp(1.25rem, 2vw, 1.5rem);
     border: none;
     border-radius: var(--raduis);
     letter-spacing: 0.5px;
+    transition: transform var(--transition-time);
     cursor: pointer;
+
+    &:active {
+        transform: scale(0.95);
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+    }
 }
 
 .primary {

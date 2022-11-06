@@ -9,13 +9,24 @@ import type { LoginUserForm, RegisterUserForm, User } from '../interfaces/user.i
 export const useUserStore = defineStore('user', () => {
 	// State
 	const currentUser = ref<User | null>(null);
-	const isAuthenticated = ref<boolean>(false);
+	const loaded = ref(false);
+	const isAuthenticated = ref(false);
 	
 	// Getters (computeds)
 	
 
 	// Watchers
-	watch(currentUser, () => currentUser.value ? isAuthenticated.value = true : isAuthenticated.value = false);
+	watch(currentUser, () => {
+		if (currentUser.value) {
+			isAuthenticated.value = true;
+		}
+		else if (!currentUser.value && loaded.value) {
+			isAuthenticated.value = false;
+		} 
+		else {
+			isAuthenticated.value = false;
+		}
+	});
 
 	// Actions
 	async function register(formaData: RegisterUserForm) {
@@ -38,10 +49,22 @@ export const useUserStore = defineStore('user', () => {
 		}
 	}
 
+	async function fetchCurrentUser() {
+		try {
+			currentUser.value = await AuthServices.fetchCurrentUser();
+			loaded.value = true;
+		} 
+		catch (error) {
+			loaded.value = true;
+		}
+	}
+
 	return { 
 		currentUser, 
+		loaded,
 		isAuthenticated,
 		register,
-		login 
+		login,
+		fetchCurrentUser
 	};
 });

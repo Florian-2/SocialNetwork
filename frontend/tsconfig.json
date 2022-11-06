@@ -4,7 +4,6 @@
   "compilerOptions": {
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitReturns": true,
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,

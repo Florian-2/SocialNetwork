@@ -2,6 +2,7 @@ import { translateTitle } from '@/i18n';
 
 import type { RouteRecordRaw } from 'vue-router';
 import LoginView from '@/views/LoginView.vue';
+import { isAuthenticated, isNotAuthenticated } from '../guards/auth.guards';
 
 
 
@@ -9,7 +10,7 @@ export const userRoutes: RouteRecordRaw[] = [
     {
         path: "/",
         redirect: () => { 
-            return { name: "Login" }
+            return { path: "/login" }
         }
     },
     {
@@ -18,6 +19,7 @@ export const userRoutes: RouteRecordRaw[] = [
         meta: {
             title: `Hola - ${translateTitle("title_page.login")}`
         },
+        beforeEnter: [isNotAuthenticated],
         component: LoginView
     },
     {
@@ -26,6 +28,16 @@ export const userRoutes: RouteRecordRaw[] = [
         meta: {
             title: `Hola - ${translateTitle("title_page.register")}`
         },
+        beforeEnter: [isNotAuthenticated],
         component: () => import('@/views/RegisterView.vue')
+    },
+    {
+        path: "/profile",
+        name: "Profile",
+        meta: {
+            title: `Hola - ${translateTitle("title_page.profile")}`
+        },
+        beforeEnter: [isAuthenticated],
+        component: () => import("@/views/ProfileView.vue")
     }
 ];

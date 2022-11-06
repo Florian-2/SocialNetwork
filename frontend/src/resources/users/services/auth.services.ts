@@ -22,4 +22,15 @@ export async function login(formData: LoginUserForm): Promise<User> {
     }
 }
 
-export default { register, login };
+export async function fetchCurrentUser(): Promise<User> {
+    try {
+        const user = await axios.get("/api/user/profile");
+        return user.data;
+    } 
+    catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+export default { register, login, fetchCurrentUser };

@@ -1,12 +1,13 @@
 {
     "title_page": {
         "login": "Login",
-        "register": "Register"
+        "register": "Register",
+        "profile": "Profile"
     },
     "form": {
         "title": {
             "login": "Login",
-            "register": "Register"
+            "register": "Register"    
         },
         "label": {
             "pseudo": "Username",

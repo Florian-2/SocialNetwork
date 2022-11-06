@@ -16,7 +16,7 @@ export async function isAuthenticated(req: Request, _res: Response, next: NextFu
         const decode = await verifyToken(token);
 
         const userService = new UserService();
-        const user = await userService.getUserById(decode.id, { withPassword: false });
+        const user = await userService.getUserById(decode.id);
 
         req.user = user;
 

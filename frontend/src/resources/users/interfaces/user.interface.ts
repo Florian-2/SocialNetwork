@@ -1,5 +1,6 @@
 export interface User {
     _id: string;
+    admin: boolean;
     pseudo: string;
     email: string;
     language: string;

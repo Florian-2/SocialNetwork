@@ -4,7 +4,7 @@ import Controller from '@/utils/interfaces/controller.interface';
 import HttpException from '@/utils/exceptions/http.exception';
 
 class UserController implements Controller {
-    public path = '/users';
+    public path = '/user';
     public router = Router();
     // private UserService = new UserService();
 
@@ -18,7 +18,7 @@ class UserController implements Controller {
 
     private profile(req: Request, res: Response, next: NextFunction) {
         if (!req.user) {
-            return next(new HttpException(404, "Vous n'êtes pas connecté"));
+            return next(new HttpException(401, "Vous n'êtes pas connecté"));
         }
 
         delete req.user.password;

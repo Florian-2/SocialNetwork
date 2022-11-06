@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { z } from 'zod';
 import { useField, useForm } from 'vee-validate';
 import { toFormValidator } from '@vee-validate/zod';
@@ -13,6 +14,7 @@ import IconEyeSlash from '@/components/icons/IconEyeSlash.vue';
 import Button from '@/components/ui/Button.vue';
 
 
+const router = useRouter();
 const { t } = useI18n();
 const userStore = useUserStore();
 const errorServer = ref<string>();
@@ -27,7 +29,7 @@ const form = useForm<LoginUserForm>({
     validationSchema,
     initialValues: {
         email: "florian@mail.com",
-        password: "Florian02"
+        password: "Florian2022"
     }
 });
 
@@ -44,8 +46,9 @@ const {
 
 
 const onSubmit = form.handleSubmit(async (formData) => {       
-    try {      
+    try {
         await userStore.login(formData);
+        router.push({ name: "Profile" });
     } 
     catch (e) {
         if (e instanceof AxiosError) { 
@@ -63,6 +66,7 @@ const handleShowPassword = (): boolean => showPassword.value = !showPassword.val
 </script>
 
 <template>
+
     <section class="form-container">
         <div class="form-content">
             <h1>{{ t("form.title.login") }}</h1>
@@ -104,9 +108,16 @@ const handleShowPassword = (): boolean => showPassword.value = !showPassword.val
 
                 <p v-if="errorServer" class="error-server">{{ errorServer }}</p>
 
-                <Button @click="onSubmit" type="primary" :disabled="form.isSubmitting.value">Connexion</Button>
+                <Button 
+                    type="primary"
+                    @click="onSubmit" 
+                    :disabled="form.isSubmitting.value" 
+                    :is-loading="form.isSubmitting.value"
+                >
+                    Connexion
+                </Button>
             </form>
-            
+
             <p class="question-form">
                 Vous n'avez pas de compte ? 
                 <RouterLink to="Register">Inscription</RouterLink>

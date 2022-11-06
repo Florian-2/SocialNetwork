@@ -45,5 +45,8 @@
     "@/utils": "dist/utils",
     "@/middleware": "dist/middleware",
     "@/config": "dist/config"
+  },
+  "volta": {
+    "node": "18.12.1"
   }
 }
