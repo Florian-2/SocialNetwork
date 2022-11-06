@@ -49,6 +49,16 @@ export const useUserStore = defineStore('user', () => {
 		}
 	}
 
+	async function logout() {
+		try {
+			await AuthServices.logout();
+			currentUser.value = null;
+		} 
+		catch (error) {
+			throw error;
+		}
+	}
+
 	async function fetchCurrentUser() {
 		try {
 			currentUser.value = await AuthServices.fetchCurrentUser();
@@ -65,6 +75,7 @@ export const useUserStore = defineStore('user', () => {
 		isAuthenticated,
 		register,
 		login,
+		logout,
 		fetchCurrentUser
 	};
 });

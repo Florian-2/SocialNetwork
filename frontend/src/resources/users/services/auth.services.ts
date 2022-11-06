@@ -22,6 +22,15 @@ export async function login(formData: LoginUserForm): Promise<User> {
     }
 }
 
+export async function logout(): Promise<void> {
+    try {
+        await axios.delete("/api/auth/logout");
+    } 
+    catch (error) {
+        throw error;
+    }
+}
+
 export async function fetchCurrentUser(): Promise<User> {
     try {
         const user = await axios.get("/api/user/profile");
@@ -33,4 +42,4 @@ export async function fetchCurrentUser(): Promise<User> {
     }
 }
 
-export default { register, login, fetchCurrentUser };
+export default { register, login, logout, fetchCurrentUser };

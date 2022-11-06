@@ -1,5 +1,20 @@
 <script setup lang="ts">
+import { useUserStore } from '@/resources/users/store/user';
+import { useRouter } from 'vue-router';
+import Button from '@/components/ui/Button.vue';
 
+const userStore = useUserStore();
+const router = useRouter();
+
+async function logout() {
+    try {
+        await userStore.logout();
+        router.push("Login");
+    } 
+    catch (error) {
+        router.push("Login")
+    }
+}
 </script>
 
 <template>
@@ -9,7 +24,7 @@
             <div id="point"></div>
         </div>
         
-        
+        <Button @click="logout" type="danger">déconnexion</Button>
     </header>
 </template>
 

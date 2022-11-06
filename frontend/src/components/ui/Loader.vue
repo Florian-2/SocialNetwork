@@ -1,7 +1,3 @@
-<script setup lang="ts">
-
-</script>
-
 <template>
     <div class="loader-container">
         <span class="dot dot-1"></span>
