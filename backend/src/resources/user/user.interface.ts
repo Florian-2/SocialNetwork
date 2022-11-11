@@ -7,6 +7,7 @@ export default interface User extends Document {
     pseudo: string; 
     language: string;
     email: string;
+    thumbnail: string;
     password?: string;
     admin: boolean;
 }

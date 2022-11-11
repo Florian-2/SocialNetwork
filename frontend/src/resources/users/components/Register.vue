@@ -11,8 +11,10 @@ import { AxiosError } from 'axios'
 import IconEye from '@/components/icons/IconEye.vue';
 import IconEyeSlash from '@/components/icons/IconEyeSlash.vue';
 import Button from '@/components/ui/Button.vue';
+import { useRouter } from 'vue-router';
 
 
+const router = useRouter();
 const { t } = useI18n();
 const userStore = useUserStore();
 const showPassword = ref(false);
@@ -64,6 +66,7 @@ const {
 const onSubmit = form.handleSubmit(async (formData) => {       
     try {      
         await userStore.register(formData);
+        router.push({ name: "Posts" });
     } 
     catch (e) {
         if (e instanceof AxiosError) {           

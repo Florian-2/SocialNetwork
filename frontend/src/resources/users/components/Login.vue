@@ -48,7 +48,7 @@ const {
 const onSubmit = form.handleSubmit(async (formData) => {       
     try {
         await userStore.login(formData);
-        router.push({ name: "Profile" });
+        router.push({ name: "Posts" });
     } 
     catch (e) {
         if (e instanceof AxiosError) { 

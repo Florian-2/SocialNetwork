@@ -18,6 +18,11 @@ const UserSchema = new Schema<User>({
         type: String,
         required: true
     },
+    thumbnail: {
+        type: String,
+        require: false,
+        default: "thumbnail/default_profile.png"
+    },
     language: {
         type: String,
         require: true

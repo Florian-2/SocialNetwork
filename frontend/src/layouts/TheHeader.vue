@@ -12,7 +12,7 @@ async function logout() {
         router.push("Login");
     } 
     catch (error) {
-        router.push("Login")
+        router.push("Login");
     }
 }
 </script>
@@ -24,12 +24,14 @@ async function logout() {
             <div id="point"></div>
         </div>
         
-        <Button @click="logout" type="danger">déconnexion</Button>
+        <Button type="danger" @click="logout">déconnexion</Button>
     </header>
 </template>
 
 <style scoped lang="scss">
 header {
+    height: 50px;
+
 	padding-inline: 5px;
     display: flex;
     justify-content: space-between;

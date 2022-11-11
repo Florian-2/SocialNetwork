@@ -8,14 +8,18 @@ defineProps<{
 <template>
     <button :class="type">
         <span v-if="isLoading">Chargement...</span>
-        <span v-else>
+
+        <template v-else>
             <slot></slot>
-        </span>
+        </template>
     </button>
 </template>
 
 <style scoped lang="scss">
 button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     padding: 1rem;
     font-size: clamp(1.25rem, 2vw, 1.5rem);
     border: none;
