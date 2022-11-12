@@ -34,22 +34,22 @@ class PostController implements Controller {
     }
 
     private formatImgFile(req: Request): Image[] | undefined {
-        const files: Image[] = [];        
+        const files: Image[] = [];
                     
-        if (Array.isArray(req.files)) {
-            req.files.forEach((file) => {
-                files.push({
-                    filename: file.filename,
-                    path: `/${file.mimetype.split("/")[0]}s/${file.filename}`, // Ex: /images/photo.jpg
-                    absolutePath: file.path,
-                    size: file.size
-                });
-            })
-    
-            return files;
+        if (!Array.isArray(req.files)) {
+            return;
         }
     
-        return;
+        req.files.forEach((file) => {
+            files.push({
+                filename: file.filename,
+                path: `/${file.mimetype.split("/")[0]}s/${file.filename}`, // Ex: /images/photo.jpg
+                absolutePath: file.path,
+                size: file.size
+            });
+        })
+
+        return files;
     }
 
     private async createPost(req: Request, res: Response, next: NextFunction) {

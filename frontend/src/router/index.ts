@@ -8,7 +8,14 @@ const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
 	routes: [
 		...postRoutes,
-		...userRoutes
+		...userRoutes,
+		{
+			path: "/:notfound(.*)*",
+			meta: {
+				title: "Hola - Page introuvable"
+			},
+			component: () => import("@/views/NotFoundView.vue"),
+		}
 	]
 });
 

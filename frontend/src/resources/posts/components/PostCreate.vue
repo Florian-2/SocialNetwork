@@ -1,15 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useResizeObserver } from '@vueuse/core';
+import { useUserStore } from '@/resources/users/store/user';
+import Modal from '@/components/ui/Modal.vue';
 import Button from '@/components/ui/Button.vue';
 import IconImages from '@/components/icons/IconImages.vue';
 import IconEmojiSmile from '@/components/icons/IconEmojiSmile.vue';
 import IconSendMessage from '@/components/icons/IconSendMessage.vue';
-import { useUserStore } from '@/resources/users/store/user';
 
 
 const userStore = useUserStore();
 const textarea = ref<HTMLTextAreaElement>();
+const inputFiles = ref<{ id: string, file: File, url: string }[]>([]);
+const errorInputFile = ref<string>("");
+const isModalOpen = ref(false);
 
 useResizeObserver(textarea, () => autogrow());
 
@@ -20,12 +24,69 @@ function autogrow() {
     }
 }
 
+const availableMimeType= [
+    "image/png",
+    "image/jpg",
+    "image/jpeg",
+    "image/webp",
+];
+
+watch(inputFiles.value, () => {
+    if (inputFiles.value) {
+        for (const { id, file } of inputFiles.value) {             
+            if (!availableMimeType.includes(file.type)) {
+                deleteFile(id);
+                errorInputFile.value = "Seuls les fichiers png, jpg et webp sont supportés";
+                isModalOpen.value = true;
+            }
+        }
+    }
+});
+
+onMounted(() => {
+    window.addEventListener("drop", (e) => e.preventDefault());
+    window.addEventListener("dragover", (e) => e.preventDefault());
+});
+
+function onChange(e: Event) {
+    const input = e.target as HTMLInputElement;
+
+    if (input.files) {
+        for (const file of input.files) {
+            inputFiles.value.push({ file, url: URL.createObjectURL(file), id: crypto.randomUUID() });
+        }
+    }
+}
+
+function dropFiles(e: DragEvent) {
+    const files = e.dataTransfer?.files;
+
+    if (files) {
+        for (const file of files) {
+            inputFiles.value.push({ file, url: URL.createObjectURL(file), id: crypto.randomUUID() });
+        }
+    }
+}
+
+function deleteFile(id: string) {
+    console.log("delete " + id);
+    inputFiles.value.forEach((file, i) => file.id === id && inputFiles.value.splice(i, 1));
+}
+
+function closeModal() {
+    isModalOpen.value = false;
+}
+
 function onSubmit() {
     console.log("send");
 }
 </script>
 
 <template>
+    <Modal :toggle="isModalOpen" @close="closeModal">
+        <p>{{ errorInputFile }}</p>
+    </Modal>
+
     <div class="create-post-container">
         <div class="thumbnail">
             <img :src="userStore.currentUser?.thumbnail" alt="avatar">
@@ -39,7 +100,16 @@ function onSubmit() {
                     placeholder="Quoi de neuf ?"
                     @input="autogrow" 
                     @focus="autogrow"
+                    @dragenter.prevent
+                    @dragleave.prevent
+                    @dragover.prevent
+                    @drop.prevent="dropFiles"
                 ></textarea>
+
+                <div v-for="{ id, file, url } of inputFiles" :key="id">
+                    <img :src="url" :alt="file.name" draggable="false">
+                    <button @click="deleteFile(id)">X</button>
+                </div>
 
                 <Button type="primary" @click="onSubmit">
                     <IconSendMessage/>
@@ -53,7 +123,7 @@ function onSubmit() {
                         Images
                     </label>
                     
-                    <input type="file" name="files" id="files">
+                    <input @change="onChange" type="file" name="files" id="files" multiple accept=".png, .jpg, .webp">
                 </div>
 
                 <div class="option opt-emoji" role="button">
@@ -151,5 +221,11 @@ function onSubmit() {
             }
         }
     }
+}
+
+img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
 }
 </style>
