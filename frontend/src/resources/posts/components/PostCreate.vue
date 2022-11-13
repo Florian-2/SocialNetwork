@@ -2,7 +2,7 @@
 import { onMounted, ref, watch } from 'vue';
 import { useResizeObserver } from '@vueuse/core';
 import { useUserStore } from '@/resources/users/store/user';
-import Modal from '@/components/ui/Modal.vue';
+import Notification from '@/components/ui/Notification.vue';
 import Button from '@/components/ui/Button.vue';
 import IconImages from '@/components/icons/IconImages.vue';
 import IconEmojiSmile from '@/components/icons/IconEmojiSmile.vue';
@@ -11,9 +11,16 @@ import IconSendMessage from '@/components/icons/IconSendMessage.vue';
 
 const userStore = useUserStore();
 const textarea = ref<HTMLTextAreaElement>();
+const inputText = ref<string>("");
 const inputFiles = ref<{ id: string, file: File, url: string }[]>([]);
+const activeDropZone = ref(false);
 const errorInputFile = ref<string>("");
 const isModalOpen = ref(false);
+
+onMounted(() => {
+    window.addEventListener("drop", (e) => e.preventDefault());
+    window.addEventListener("dragover", (e) => e.preventDefault());
+});
 
 useResizeObserver(textarea, () => autogrow());
 
@@ -24,7 +31,7 @@ function autogrow() {
     }
 }
 
-const availableMimeType= [
+const availableMimeType = [
     "image/png",
     "image/jpg",
     "image/jpeg",
@@ -43,39 +50,52 @@ watch(inputFiles.value, () => {
     }
 });
 
-onMounted(() => {
-    window.addEventListener("drop", (e) => e.preventDefault());
-    window.addEventListener("dragover", (e) => e.preventDefault());
+watch(inputText, () => {
+    console.log(inputText.value);
 });
 
-function onChange(e: Event) {
+const toggleActiveDropZone = (): boolean => activeDropZone.value = !activeDropZone.value;
+
+function onChange(e: Event): void {
     const input = e.target as HTMLInputElement;
 
-    if (input.files) {
+    if (input.files) {        
         for (const file of input.files) {
-            inputFiles.value.push({ file, url: URL.createObjectURL(file), id: crypto.randomUUID() });
+            addFile(file);
         }
+
+        input.files = null;
     }
 }
 
-function dropFiles(e: DragEvent) {
+function dropFiles(e: DragEvent): void {
     const files = e.dataTransfer?.files;
-
+    
     if (files) {
         for (const file of files) {
-            inputFiles.value.push({ file, url: URL.createObjectURL(file), id: crypto.randomUUID() });
+            addFile(file);
         }
     }
+
+    toggleActiveDropZone();
 }
 
-function deleteFile(id: string) {
-    console.log("delete " + id);
-    inputFiles.value.forEach((file, i) => file.id === id && inputFiles.value.splice(i, 1));
+function addFile(file: File): void {
+    if (inputFiles.value.length >= 2) {
+        errorInputFile.value = "Vous êtes limité à 2 images par post";
+        isModalOpen.value = true;
+        return;
+    }
+
+    inputFiles.value.push({ file, url: URL.createObjectURL(file), id: crypto.randomUUID() });
 }
 
-function closeModal() {
-    isModalOpen.value = false;
+function deleteFile(id: string): void {
+    const index = inputFiles.value.findIndex((file) => file.id === id);
+    inputFiles.value.splice(index, 1);
 }
+
+const closeModal = () => isModalOpen.value = !isModalOpen.value;
 
 function onSubmit() {
     console.log("send");
@@ -83,9 +103,13 @@ function onSubmit() {
 </script>
 
 <template>
-    <Modal :toggle="isModalOpen" @close="closeModal">
-        <p>{{ errorInputFile }}</p>
-    </Modal>
+    <Teleport to="body">
+        <Transition name="modal">
+            <Notification v-if="isModalOpen" @close="closeModal" :duration="5000">
+                <p>{{ errorInputFile }}</p>
+            </Notification>
+        </Transition>
+    </Teleport>
 
     <div class="create-post-container">
         <div class="thumbnail">
@@ -96,12 +120,14 @@ function onSubmit() {
             <div class="post-input">
                 <textarea 
                     ref="textarea"
+                    v-model="inputText"
                     name="post" id="post"
                     placeholder="Quoi de neuf ?"
+                    :class="{ 'active-dropzone': activeDropZone }"
                     @input="autogrow" 
                     @focus="autogrow"
-                    @dragenter.prevent
-                    @dragleave.prevent
+                    @dragenter.prevent="toggleActiveDropZone"
+                    @dragleave.prevent="toggleActiveDropZone"
                     @dragover.prevent
                     @drop.prevent="dropFiles"
                 ></textarea>
@@ -123,7 +149,7 @@ function onSubmit() {
                         Images
                     </label>
                     
-                    <input @change="onChange" type="file" name="files" id="files" multiple accept=".png, .jpg, .webp">
+                    <input @change="onChange" type="file" name="files" id="files" multiple :accept="availableMimeType.join(', ')">
                 </div>
 
                 <div class="option opt-emoji" role="button">
@@ -179,6 +205,11 @@ function onSubmit() {
 
             &:focus {
                 border-color: var(--t-color-border-focus);
+            }
+
+            &.active-dropzone {
+                border-color: var(--t-color-border-focus);
+                background-color: var(--color-hover);
             }
         }
 
