@@ -54,6 +54,8 @@ class PostController implements Controller {
 
     private async createPost(req: Request, res: Response, next: NextFunction) {
         try {
+            console.log(req.files);
+            
             const files = this.formatImgFile(req);
 
             const post = await this.PostServices.createPost({
