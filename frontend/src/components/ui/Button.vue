@@ -2,11 +2,12 @@
 defineProps<{
     type?: "primary" | "danger";
     isLoading?: boolean;
+    disabled?: boolean;
 }>();
 </script>
 
 <template>
-    <button :class="type">
+    <button :class="type" :disabled="disabled">
         <span v-if="isLoading">Chargement...</span>
 
         <template v-else>

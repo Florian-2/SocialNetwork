@@ -1,34 +1,42 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
-import { useResizeObserver, useDropZone, useObjectUrl } from '@vueuse/core';
+import { ref, watch, computed } from 'vue';
+import { useResizeObserver, useDropZone, useObjectUrl, useEventListener, onClickOutside } from '@vueuse/core';
 import { usePostStore } from '../store/post';
-import type { CreatePost } from '../interfaces/post.interface';
 import { useUserStore } from '@/resources/users/store/user';
+import { AVAILABLE_MIMETYPE, MAX_SIZE_PICTURE } from '../constant';
 import Notification from '@/components/ui/Notification.vue';
 import Button from '@/components/ui/Button.vue';
 import IconImages from '@/components/icons/IconImages.vue';
-import IconClose from '@/components/icons/IconClose.vue';
 import IconEmojiSmile from '@/components/icons/IconEmojiSmile.vue';
 import IconSendMessage from '@/components/icons/IconSendMessage.vue';
+import type { Picture } from '../types/Picture';
+import EmojiPicker from 'vue3-emoji-picker';
+import 'vue3-emoji-picker/css'
+import PreviewPicture from './ui/PreviewPicture.vue';
+import CharCounter from './ui/CharCounter.vue';
 
+
+const emoji = ref<HTMLElement>();
+const showEmojiPicker = ref(false);
+const toggleShowEmojiPicker = () => showEmojiPicker.value = !showEmojiPicker.value;
+onClickOutside(emoji, () => showEmojiPicker.value = false);
 
 const userStore = useUserStore();
 const postStore = usePostStore();
+
 const textarea = ref<HTMLTextAreaElement>();
-const { isOverDropZone } = useDropZone(textarea, onDrop);
-const limitOfCharactere = 300;
+const dropZone = ref<HTMLDivElement>();
+const { isOverDropZone } = useDropZone(dropZone, onDrop);
 
 const inputText = ref<string>("");
-const inputTextError = ref<string>("");
-
-const inputFiles = ref<{ id: string, file: File, url: string }[]>([]);
+const inputFiles = ref<Picture[]>([]);
 const errorInputFile = ref<string>("");
-const isModalOpen = ref(false);
 
-onMounted(() => {
-    window.addEventListener("drop", (e) => e.preventDefault());
-    window.addEventListener("dragover", (e) => e.preventDefault());
-});
+const isModalOpen = ref(false);
+const closeModal = () => isModalOpen.value = !isModalOpen.value;
+
+useEventListener(window, "drop", (e) => e.preventDefault());
+useEventListener(window, "dragover", (e) => e.preventDefault());
 
 useResizeObserver(textarea, () => autogrow());
 
@@ -39,33 +47,25 @@ function autogrow() {
     }
 }
 
-const availableMimeType = [
-    "image/png",
-    "image/jpg",
-    "image/jpeg",
-    "image/webp",
-];
-
 watch(inputFiles.value, () => {
     if (inputFiles.value) {
         for (const { id, file } of inputFiles.value) {
-            if (!availableMimeType.includes(file.type)) {
+            if (!AVAILABLE_MIMETYPE.includes(file.type)) {
                 deleteFile(id);
                 errorInputFile.value = "Seuls les fichiers png, jpg et webp sont supportés";
+                isModalOpen.value = true;
+            }
+
+            if (file.size > MAX_SIZE_PICTURE) {
+                deleteFile(id);
+                errorInputFile.value = `"${file.name}" fichier trop volumineux (10Mo maximum)`;
                 isModalOpen.value = true;
             }
         }
     }
 });
 
-watch(inputText, () => {
-    if (inputText.value.length > limitOfCharactere)
-        inputTextError.value = `${limitOfCharactere} caractères maximum`;
-    else 
-        inputTextError.value = "";
-});
-
-function onDrop(files: File[] | null) {   
+function onDrop(files: File[] | null) {
     if (files) {
         for (const file of files) {
             addFile(file);
@@ -101,24 +101,31 @@ function deleteFile(id: string): void {
     inputFiles.value.splice(index, 1);
 }
 
-const closeModal = () => isModalOpen.value = !isModalOpen.value;
+const formIsValid = computed((): boolean => {
+    if (inputText.value.length > 0 || inputFiles.value.length > 0)
+        return true;
 
-async function onSubmit() {
+    return false;
+})
+
+async function onSubmit(): Promise<void> {   
     const images: File[] = inputFiles.value.map((obj) => obj.file);
 
-    const formData: CreatePost = {
-        message: inputText.value,
-        images: images
-    }
-
     try {
-        if (!inputTextError.value) {
-            await postStore.createPost(formData);
+        if (formIsValid.value) {
+            await postStore.createPost({
+                message: inputText.value,
+                images: images
+            });
         }
     } 
     catch (error) {
         console.log(error);
     }
+}
+
+function onSelectEmoji(emoji: any) {
+    inputText.value += emoji.i;
 }
 </script>
 
@@ -131,7 +138,7 @@ async function onSubmit() {
         </Transition>
     </Teleport>
 
-    <div class="create-post-container">
+    <div ref="dropZone" :class="['create-post-container', { 'active-dropzone': isOverDropZone }]">
         <div class="thumbnail">
             <img :src="userStore.currentUser?.thumbnail" alt="avatar">
         </div>
@@ -143,28 +150,13 @@ async function onSubmit() {
                     v-model="inputText" 
                     name="post" id="post" 
                     placeholder="Quoi de neuf ?"
-                    :class="{ 'active-dropzone': isOverDropZone }" 
                     @input="autogrow" 
                     @focus="autogrow"
                 ></textarea>
 
-                <div class="information">
-                    <span v-if="inputTextError" class="error error-message">{{ inputTextError }}</span>
+                <CharCounter :sentence="inputText" :limit="300" />
 
-                    <span v-if="inputText.length > 0" :class="['character-counter', { 'error': inputTextError }]">
-                        {{ inputText.length }}/{{ limitOfCharactere }}
-                    </span>
-                </div>
-
-                <div v-if="inputFiles.length > 0" class="box-images">
-                    <div class="item-image" v-for="{ id, file, url } of inputFiles" :key="id">
-                        <img :src="url" :alt="file.name" draggable="false">
-
-                        <Button @click="deleteFile(id)">
-                            <IconClose color="#fff" />
-                        </Button>
-                    </div>
-                </div>
+                <PreviewPicture :images="inputFiles" @delete-file="deleteFile($event)" />
             </div>
 
             <div class="options-container">
@@ -179,20 +171,29 @@ async function onSubmit() {
                         name="files" id="files" 
                         @change="onChange"  
                         multiple
-                        :accept="availableMimeType.join(', ')"
+                        :accept="AVAILABLE_MIMETYPE.join(', ')"
                     >
                 </div>
 
-                <div class="option opt-emoji" role="button">
+                <div class="option opt-emoji" role="button" @click="toggleShowEmojiPicker">
                     <IconEmojiSmile />
                     <p>Emojis</p>
                 </div>
-
-                <Button type="primary" @click="onSubmit">
+                
+                <Button type="primary" @click="onSubmit" :disabled="!formIsValid">
                     <IconSendMessage />
                 </Button>
             </div>
         </div>
+        
+        <EmojiPicker 
+            ref="emoji"
+            v-show="showEmojiPicker" 
+            class="emoji-picker" 
+            :native="true" 
+            :disable-skin-tones="true" 
+            @select="onSelectEmoji" 
+        />
     </div>
 </template>
 
@@ -204,6 +205,20 @@ async function onSubmit() {
     box-shadow: var(--shadow);
     border-radius: calc(var(--raduis) * 4);
     background-color: var(--t-color-background-2);
+    transition: background-color var(--transition-time);
+
+    position: relative;
+
+    &.active-dropzone {
+        background-color: aliceblue;
+    }
+
+    .emoji-picker {
+        position: absolute;
+        top: calc(100% + 1rem);
+        right: 50%;
+        transform: translateX(50%);
+    }
 
     .thumbnail {
         border-radius: 50%;
@@ -227,7 +242,7 @@ async function onSubmit() {
         .post {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.5rem;
 
             textarea {
                 width: 100%;
@@ -241,52 +256,6 @@ async function onSubmit() {
 
                 &:focus {
                     border-color: var(--t-color-border-focus);
-                }
-
-                &.active-dropzone {
-                    border-color: var(--t-color-border-focus);
-                    background-color: var(--color-hover);
-                }
-            }
-
-            .information {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                font-size: 1.2rem;
-
-                .character-counter {
-                    margin-left: auto;
-                }
-
-                .error {
-                    color: var(--color-danger);
-                }
-            }
-            
-            .box-images {
-                display: flex;
-                justify-content: flex-start;
-                gap: 1.5rem;
-
-                .item-image {
-                    position: relative;
-
-                    img {
-                        max-width: 150px;
-                        border-radius: calc(var(--raduis) * 2);
-                        overflow: hidden;
-                        object-fit: cover;
-                    }
-
-                    button {
-                        padding: 0;
-                        position: absolute;
-                        right: 5px;
-                        top: 5px;
-                        border-radius: 50%;
-                        background-color: hsla(0, 0%, 0%, 0.65);
-                    }
                 }
             }
         }

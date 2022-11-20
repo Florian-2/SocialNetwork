@@ -5,9 +5,8 @@ import { PostDocument } from './post.interface';
 const PostSchema = new Schema({
     message: {
         type: String,
-        required: [true, "Message requis"],
-        trim: true,
-        maxlength: [250, "Vous êtes limité à 250 caractères"]
+        required: false,
+        maxlength: [300, "300 caractères maximum"]
     },
     images: {
         type: [Object],

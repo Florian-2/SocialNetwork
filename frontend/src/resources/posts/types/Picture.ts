@@ -1,0 +1,1 @@
+export type Picture = { id: string, file: File, url: string };

@@ -12,7 +12,9 @@ class PostService {
             const post = await PostModel.create(body);
             return post;
         } 
-        catch (error: any) {           
+        catch (error: any) { 
+            console.log(error);
+            
             throw new Error("Une erreur est survenue lors de la création du post");
         }
     }

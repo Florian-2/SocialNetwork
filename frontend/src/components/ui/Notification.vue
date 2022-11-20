@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount } from 'vue';
+import { onMounted, onUnmounted } from 'vue';
 import IconClose from '@/components/icons/IconClose.vue';
 import Button from '@/components/ui/Button.vue';
 
@@ -14,7 +14,7 @@ const emit = defineEmits<{
 const closeModalTimeout = setTimeout(() => emit('close'), props.duration);
 
 onMounted(() => closeModalTimeout);
-onBeforeUnmount(() => clearInterval(closeModalTimeout));
+onUnmounted(() => clearInterval(closeModalTimeout));
 </script>
 
 <template>
