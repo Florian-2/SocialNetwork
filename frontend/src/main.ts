@@ -13,4 +13,6 @@ app.use(createPinia());
 app.use(router);
 app.use(i18n);
 
+// app.provide('days', days);
+
 app.mount('#app');

@@ -10,10 +10,9 @@ postsStore.getPosts();
 </script>
 
 <template>
-    <p>{{ postsStore.fetch.isLoading }}</p>
     <Loader v-if="postsStore.fetch.isLoading"/>
 
-    <section v-else class="container-posts">
+    <section v-else>
         <PostCard 
             v-for="post in postsStore.posts" :key="post._id"
             :post="post" 
@@ -24,9 +23,5 @@ postsStore.getPosts();
 </template>
 
 <style scoped>
-.container-posts {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-}
+
 </style>

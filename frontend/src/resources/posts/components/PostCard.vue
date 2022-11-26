@@ -7,9 +7,10 @@ import IconEdit from '@/components/icons/IconEdit.vue';
 import type { Post } from '../interfaces/post.interface';
 import IconDelete from '@/components/icons/IconDelete.vue';
 import IconEye from '@/components/icons/IconEye.vue';
+import { useRelativeTime } from '@/composables/useRelativeTime';
 
 
-defineProps<{
+const props = defineProps<{
     post: Post;
     user_id: string;
 }>();
@@ -18,18 +19,13 @@ const emit = defineEmits<{
     (e: "delete-post", id: string): void
 }>();
 
+const { time } = useRelativeTime(props.post.createdAt);
+
 const optionsRef = ref<HTMLDivElement>();
 const btnShowOptionsRef = ref<HTMLButtonElement>();
 const showOptions = ref(false);
 const toggleShowOptions = () => showOptions.value = !showOptions.value;
 onClickOutside(optionsRef, () => showOptions.value = false, { ignore: [btnShowOptionsRef] });
-
-// function formatDate(date: string) {
-//     const parse = Date.parse(date);
-//     const dateFormat = Intl.DateTimeFormat(undefined, { weekday: "long", day: "numeric", month: "short", hour: "numeric" });
-    
-//     return dateFormat.format(parse);
-// }
 </script>
 
 <template>
@@ -42,7 +38,7 @@ onClickOutside(optionsRef, () => showOptions.value = false, { ignore: [btnShowOp
 
                 <div class="infos">
                     <p class="pseudo">{{ post.author.pseudo }}</p>
-                    <p class="date">{{ post.createdAt }}</p>
+                    <p class="date">{{ time }}</p>
                 </div>
             </div>
 
@@ -87,6 +83,7 @@ onClickOutside(optionsRef, () => showOptions.value = false, { ignore: [btnShowOp
 <style scoped lang="scss">
 .card-post {
     padding: 2rem;
+    margin-block: 2rem;
     background-color: var(--t-color-background-2);
     box-shadow: var(--shadow);
     border-radius: calc(var(--raduis) * 3);

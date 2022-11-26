@@ -1,6 +1,6 @@
 import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
-import { detectedLanguage } from '@/i18n'
+import { browserLanguage } from '@/i18n'
 import AuthServices from '../services/auth.services';
 
 import type { LoginUserForm, RegisterUserForm, User } from '../interfaces/user.interface';
@@ -31,7 +31,7 @@ export const useUserStore = defineStore('user', () => {
 	// Actions
 	async function register(formaData: RegisterUserForm) {
 		try {
-			const user = await AuthServices.register({ ...formaData, language: detectedLanguage });
+			const user = await AuthServices.register({ ...formaData, language: browserLanguage });
 			currentUser.value = user;
 		} 
 		catch (error) {
