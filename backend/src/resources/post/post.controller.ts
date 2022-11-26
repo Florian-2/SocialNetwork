@@ -53,12 +53,12 @@ class PostController implements Controller {
     }
 
     private async createPost(req: Request, res: Response, next: NextFunction) {
-        try {           
+        try {
             const files = this.formatImgFile(req);
 
             const post = await this.PostServices.createPost({
                 message: req.body.message,
-                author_id: req.user._id as UserID,
+                author: req.user._id,
                 images: files
             });
 
@@ -90,7 +90,7 @@ class PostController implements Controller {
     private async getManyPosts(req: Request, res: Response, next: NextFunction) {
         try {
             const page = req.query.page ? Number(req.query.page) : 1;
-            const limit = req.query.limit ? Number(req.query.limit) : 5;
+            const limit = req.query.limit ? Number(req.query.limit) : 5; // 15
             
             const { posts, countPosts } = await this.PostServices.getManyPosts(page, limit);
 

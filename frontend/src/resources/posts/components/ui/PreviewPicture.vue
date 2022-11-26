@@ -37,7 +37,7 @@ const emit = defineEmits<{
         img {
             width: 100%;
             height: 100%;
-            border-radius: calc(var(--raduis) * 2);
+            border-radius: 8px;
         }
 
         button {

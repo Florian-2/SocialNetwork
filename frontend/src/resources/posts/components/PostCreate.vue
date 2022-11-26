@@ -16,11 +16,6 @@ import PreviewPicture from './ui/PreviewPicture.vue';
 import CharCounter from './ui/CharCounter.vue';
 
 
-const emoji = ref<HTMLElement>();
-const showEmojiPicker = ref(false);
-const toggleShowEmojiPicker = () => showEmojiPicker.value = !showEmojiPicker.value;
-onClickOutside(emoji, () => showEmojiPicker.value = false);
-
 const userStore = useUserStore();
 const postStore = usePostStore();
 
@@ -31,6 +26,14 @@ const { isOverDropZone } = useDropZone(dropZone, onDrop);
 const inputText = ref<string>("");
 const inputFiles = ref<Picture[]>([]);
 const errorInputFile = ref<string>("");
+
+const isSubmitting = ref(false);
+
+const emojiRef = ref<HTMLElement>();
+const btnShowEmojiRef = ref<HTMLDivElement>();
+const showEmojiPicker = ref(false);
+const toggleShowEmojiPicker = () => showEmojiPicker.value = !showEmojiPicker.value;
+onClickOutside(emojiRef, () => showEmojiPicker.value = false, { ignore: [btnShowEmojiRef] });
 
 const isModalOpen = ref(false);
 const closeModal = () => isModalOpen.value = !isModalOpen.value;
@@ -108,19 +111,28 @@ const formIsValid = computed((): boolean => {
     return false;
 })
 
+
+
 async function onSubmit(): Promise<void> {   
     const images: File[] = inputFiles.value.map((obj) => obj.file);
 
     try {
         if (formIsValid.value) {
+            isSubmitting.value = true
             await postStore.createPost({
                 message: inputText.value,
                 images: images
             });
+
+            inputText.value = "";
+            inputFiles.value = [];
         }
     } 
     catch (error) {
         console.log(error);
+    }
+    finally {
+        isSubmitting.value = false;
     }
 }
 
@@ -140,7 +152,7 @@ function onSelectEmoji(emoji: any) {
 
     <div ref="dropZone" :class="['create-post-container', { 'active-dropzone': isOverDropZone }]">
         <div class="thumbnail">
-            <img :src="userStore.currentUser?.thumbnail" alt="avatar">
+            <img :src="userStore.currentUser?.thumbnail" alt="avatar" draggable="false">
         </div>
 
         <div class="create-post-content">
@@ -175,19 +187,19 @@ function onSelectEmoji(emoji: any) {
                     >
                 </div>
 
-                <div class="option opt-emoji" role="button" @click="toggleShowEmojiPicker">
+                <div ref="btnShowEmojiRef" class="option opt-emoji" role="button" @click="toggleShowEmojiPicker">
                     <IconEmojiSmile />
                     <p>Emojis</p>
                 </div>
                 
-                <Button type="primary" @click="onSubmit" :disabled="!formIsValid">
+                <Button type="primary" @click="onSubmit" :disabled="!formIsValid" :is-loading="isSubmitting">
                     <IconSendMessage />
                 </Button>
             </div>
         </div>
         
         <EmojiPicker 
-            ref="emoji"
+            ref="emojiRef"
             v-show="showEmojiPicker" 
             class="emoji-picker" 
             :native="true" 
@@ -200,10 +212,11 @@ function onSelectEmoji(emoji: any) {
 <style scoped lang="scss">
 .create-post-container {
     padding: 1rem;
+    margin-bottom: 2rem;
     display: flex;
     gap: 2rem;
     box-shadow: var(--shadow);
-    border-radius: calc(var(--raduis) * 4);
+    border-radius: calc(var(--raduis) * 3);
     background-color: var(--t-color-background-2);
     transition: background-color var(--transition-time);
 
@@ -221,10 +234,10 @@ function onSelectEmoji(emoji: any) {
     }
 
     .thumbnail {
-        border-radius: 50%;
-        overflow: hidden;
         min-width: 50px;
         height: 50px;
+        border-radius: 40%;
+        overflow: hidden;
 
         img {
             width: 100%;

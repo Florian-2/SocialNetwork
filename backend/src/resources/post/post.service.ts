@@ -8,13 +8,14 @@ import { deleteManyFiles } from "@/utils/features/files";
 
 class PostService {
     public async createPost(body: CreatePost): Promise<PostDocument>  {
-        try {            
+        try {
             const post = await PostModel.create(body);
-            return post;
+            const getPost = await this.getOnePost(post._id);
+
+            return getPost;
         } 
         catch (error: any) { 
             console.log(error);
-            
             throw new Error("Une erreur est survenue lors de la création du post");
         }
     }
@@ -40,10 +41,10 @@ class PostService {
     public async getManyPosts(page: number, limit: number) {
         try {
             const posts = await PostModel.find({}, { __v: 0 })
-                                                    .populate("author_id", { password: 0, __v: 0 })
+                                                    .populate("author", { password: 0, __v: 0 })
                                                     .skip((page - 1) * limit)
                                                     .limit(limit * 1)
-                                
+
             const countPosts = await PostModel.countDocuments();
 
             if (!posts) {
@@ -59,7 +60,7 @@ class PostService {
 
     public async getOnePost(postID: string): Promise<PostDocument> {
         try {
-            const post = await PostModel.findOne({ _id: postID }, { __v: 0 });
+            const post = await PostModel.findOne({ _id: postID }, { __v: 0 }).populate("author", { password: 0, __v: 0 });
 
             if (!post) {
                 throw new Error("Post introuvable");
@@ -109,7 +110,7 @@ class PostService {
         try {
             const post = await this.getOnePost(postID);
 
-            if (!(String(post.author_id) === userID)) {
+            if (!(String(post.author._id) === userID)) {
                 throw new Error();
             }
             
@@ -145,7 +146,7 @@ class PostService {
         try {
             const post = await this.getOnePost(postID);
             
-            if (!(String(post.author_id) === userID)) {
+            if (!(String(post.author._id) === userID)) {
                 throw new Error();
             }
             

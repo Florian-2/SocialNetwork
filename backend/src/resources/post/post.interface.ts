@@ -1,4 +1,5 @@
 import { Document, Schema } from 'mongoose';
+import User from '../user/user.interface';
 
 
 export type PostID = Schema.Types.ObjectId;
@@ -13,11 +14,11 @@ export interface Image {
 export interface PostDocument extends Document {
     message: string;
     images?: Image[]; 
-    author_id: Schema.Types.ObjectId;
+    author: User;
 }
 
 export interface CreatePost {
     message: string;
     images?: Image[];
-    author_id: Schema.Types.ObjectId;
+    author: Schema.Types.ObjectId;
 }

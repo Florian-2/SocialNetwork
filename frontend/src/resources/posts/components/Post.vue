@@ -1,6 +1,7 @@
 <script setup lang="ts">
+// import Loader from '@/components/ui/Loader.vue';
 import PostCreate from './PostCreate.vue';
-
+import PostList from './PostList.vue';
 
 </script>
 
@@ -11,7 +12,13 @@ import PostCreate from './PostCreate.vue';
         <div class="posts">
             <PostCreate/>
 
-            <!-- posts... -->
+            <!-- <Suspense> -->
+                <PostList/>
+<!-- 
+                <template #fallback>
+                   <Loader />
+                </template>
+            </Suspense> -->
         </div>
 
         <div class="test-2 item"></div>
@@ -30,7 +37,7 @@ import PostCreate from './PostCreate.vue';
     gap: 1.5rem;
 
     .posts {
-        flex-basis: max(600px); 
+        flex-basis: max(600px);
         flex-grow: 1;
         // flex-shrink: 0;
     }

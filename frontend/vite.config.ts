@@ -15,7 +15,8 @@ export default defineConfig({
 		port: 3000,
 		proxy: {
 		  '/api': 'http://localhost:8000',
-		  '/thumbnail': 'http://localhost:8000'
+		  '/thumbnail': 'http://localhost:8000',
+		  '/images': 'http://localhost:8000'
 		}
 	},
 	define: {

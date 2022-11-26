@@ -23,12 +23,19 @@ async function logout() {
             <h1>Hola</h1>
             <div id="point"></div>
         </div>
+
+        <RouterLink to="/profile">profil</RouterLink>
+        <RouterLink to="/posts">posts</RouterLink>
         
         <Button type="danger" @click="logout">déconnexion</Button>
     </header>
 </template>
 
 <style scoped lang="scss">
+a {
+    font-size: 1.3rem;
+}
+
 header {
     height: 50px;
 

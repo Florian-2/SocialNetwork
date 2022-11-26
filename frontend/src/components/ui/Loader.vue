@@ -19,7 +19,7 @@
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background-color: white;
+    background-color: var(--color-primary);
     animation: loader infinite var(--transition-time) alternate;
 
     &.dot-2 {

@@ -1,12 +1,14 @@
+import type { User } from "@/resources/users/interfaces/user.interface";
+
 export interface Post {
     _id: string;
-    author_id: string;
+    author: User;
     message: string;
-    images: File[];
+    images: ImagePost[];
     likesCounter: number;
     iHaveLiked: boolean;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export interface ImagePost {

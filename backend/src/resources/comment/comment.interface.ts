@@ -2,7 +2,7 @@ import { PostDocument, PostID, Image} from "@/resources/post/post.interface";
 import { Schema } from "mongoose";
 import { UserID } from "@/resources/user/user.interface";
 
-export interface CommentDocument extends Omit<PostDocument, "author_id"> { 
+export interface CommentDocument extends Omit<PostDocument, "author"> { 
     author: { id: UserID, pseudo: string };
     post_id: PostID;
 };
