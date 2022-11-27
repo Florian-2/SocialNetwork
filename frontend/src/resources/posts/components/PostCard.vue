@@ -8,6 +8,7 @@ import type { Post } from '../interfaces/post.interface';
 import IconDelete from '@/components/icons/IconDelete.vue';
 import IconEye from '@/components/icons/IconEye.vue';
 import { useRelativeTime } from '@/composables/useRelativeTime';
+import IconReport from '@/components/icons/IconReport.vue';
 
 
 const props = defineProps<{
@@ -51,6 +52,11 @@ onClickOutside(optionsRef, () => showOptions.value = false, { ignore: [btnShowOp
                     <button class="action">
                         <IconEye/>
                         <span>Voir</span>
+                    </button>
+
+                    <button class="action">
+                        <IconReport/>
+                        <span>Signaler</span>
                     </button>
 
                     <template v-if="user_id === post.author._id">
