@@ -1,11 +1,11 @@
 <script setup lang="ts">
 defineProps<{
-    cards?: number;
+    skeletons?: number;
 }>();
 </script>
 
 <template>
-     <article v-for="(_, i) of cards || 1" :key="i" class="card-post">
+     <article v-for="(_, i) of skeletons || 1" :key="i" class="card-post">
         <header>
             <div class="user">
                 <div class="thumbnail skeleton"></div>

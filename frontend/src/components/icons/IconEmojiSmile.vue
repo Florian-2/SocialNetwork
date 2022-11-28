@@ -14,5 +14,8 @@
 </template>
 
 <style scoped>
-
+svg {
+    min-width: 20px;
+    width: 20px;
+}
 </style>

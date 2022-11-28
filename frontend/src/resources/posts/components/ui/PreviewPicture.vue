@@ -29,6 +29,7 @@ const emit = defineEmits<{
     display: flex;
     justify-content: flex-start;
     gap: 1.5rem;
+    max-height: 350px;
 
     .item-image {
         position: relative;
@@ -38,6 +39,7 @@ const emit = defineEmits<{
             width: 100%;
             height: 100%;
             border-radius: 8px;
+            object-fit: cover;
         }
 
         button {

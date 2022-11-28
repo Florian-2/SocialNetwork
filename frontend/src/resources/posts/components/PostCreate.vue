@@ -80,7 +80,7 @@ function onChange(e: Event): void {
     const input = e.target as HTMLInputElement;
 
     if (input.files) {
-        for (const file of input.files) {
+        for (const file of Array.from(input.files) ) {
             addFile(file);
         }
 
@@ -263,12 +263,18 @@ function onSelectEmoji(emoji: any) {
                 padding: 0.5rem;
                 font-size: clamp(1.2rem, 2vw, 1.4rem);
                 border-radius: calc(var(--raduis) * 2);
-                border: 1px solid var(--t-color-border);
+                border: none;
                 outline: none;
                 resize: none;
+                background-color: var(--color-hover);
 
                 &:focus {
                     border-color: var(--t-color-border-focus);
+                }
+
+                &::placeholder {
+                    line-height: 32px;
+                    padding-left: 1rem;
                 }
             }
         }

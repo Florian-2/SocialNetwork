@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { onClickOutside } from "@vueuse/core"
 import Button from '@/components/ui/Button.vue';
 import IconEllipsis from '@/components/icons/IconEllipsis.vue';
 import IconEdit from '@/components/icons/IconEdit.vue';
@@ -9,6 +8,7 @@ import IconDelete from '@/components/icons/IconDelete.vue';
 import IconEye from '@/components/icons/IconEye.vue';
 import { useRelativeTime } from '@/composables/useRelativeTime';
 import IconReport from '@/components/icons/IconReport.vue';
+import Dropdown from '@/components/ui/Dropdown.vue';
 
 
 const props = defineProps<{
@@ -22,11 +22,9 @@ const emit = defineEmits<{
 
 const { time } = useRelativeTime(props.post.createdAt);
 
-const optionsRef = ref<HTMLDivElement>();
 const btnShowOptionsRef = ref<HTMLButtonElement>();
 const showOptions = ref(false);
 const toggleShowOptions = () => showOptions.value = !showOptions.value;
-onClickOutside(optionsRef, () => showOptions.value = false, { ignore: [btnShowOptionsRef] });
 </script>
 
 <template>
@@ -44,11 +42,11 @@ onClickOutside(optionsRef, () => showOptions.value = false, { ignore: [btnShowOp
             </div>
 
             <div class="box-options">
-                <Button ref="btnShowOptionsRef" @click.stop="toggleShowOptions">
+                <Button ref="btnShowOptionsRef" class="toggle-dropdown" @click.stop="toggleShowOptions">
                     <IconEllipsis/>
                 </Button>
 
-                <div ref="optionsRef" v-if="showOptions" class="options">
+                <Dropdown v-if="showOptions" :ignore-element="btnShowOptionsRef" @close="showOptions = false">
                     <button class="action">
                         <IconEye/>
                         <span>Voir</span>
@@ -70,7 +68,7 @@ onClickOutside(optionsRef, () => showOptions.value = false, { ignore: [btnShowOp
                             <span>Supprimer</span>
                         </button>
                     </template>
-                </div>
+                </Dropdown>
             </div>
         </header>
 
@@ -134,53 +132,9 @@ onClickOutside(optionsRef, () => showOptions.value = false, { ignore: [btnShowOp
         .box-options {
             position: relative;
 
-            button {
+            .toggle-dropdown {
                 padding: 0;
                 background: none;
-            }
-
-            .options {
-                position: absolute;
-                right: 0;
-                min-width: 160px;
-                display: flex;
-                flex-direction: column;
-                background-color: var(--color-white);
-                border: 1px solid var(--t-color-border);
-                border-radius: calc(var(--raduis) * 2);
-                overflow: hidden;
-
-                button {
-                    display: flex;
-                    align-items: center;
-                    gap: 1rem;
-                    width: 100%;
-                    padding: 1rem;
-                    border: none;
-                    cursor: pointer;
-                    transition: all var(--transition-time);
-
-                    span {
-                        font-weight: bold;
-                    }
-
-                    svg {
-                        width: 20px;
-                        transition: all var(--transition-time);
-                    }
-
-                    &.action:hover {
-                        background-color: var(--color-hover);
-                    }
-
-                    &.delete {
-                        color: var(--color-danger);
-
-                        svg {
-                            fill: var(--color-danger);
-                        }
-                    }
-                }
             }
         }
     }
@@ -199,16 +153,17 @@ onClickOutside(optionsRef, () => showOptions.value = false, { ignore: [btnShowOp
             width: 100%;
             display: flex;
             gap: 1rem;
+            max-height: 400px;
 
             .image {
                 flex-basis: 50%;
                 border-radius: 8px;
-                // object-fit: cover;
                 overflow: hidden;
 
                 img {
                     width: 100%;
-                    height: 100%;
+                    height: 100%; 
+                    object-fit: cover;
                 }
             }
         }

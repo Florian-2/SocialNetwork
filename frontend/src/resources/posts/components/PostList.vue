@@ -13,7 +13,7 @@ postsStore.getPosts();
 </script>
 
 <template>
-    <PostSkeleton v-if="postsStore.fetch.isLoading" :cards="3"/>
+    <PostSkeleton v-if="postsStore.fetch.isLoading" :skeletons="3"/>
 
     <section v-else>
         <PostCard 
