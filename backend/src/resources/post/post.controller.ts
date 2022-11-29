@@ -20,7 +20,7 @@ class PostController implements Controller {
         this.initialiseRoutes();
     }
 
-    private initialiseRoutes(): void {       
+    private initialiseRoutes(): void {
         this.router.post(`${this.path}/create`, isAuthenticated, uploadFile, validationFormData(createPost), this.createPost.bind(this));
         this.router.post(`${this.path}/:id/create/comment`, isAuthenticated, uploadFile, validationFormData(createComment), this.createComment.bind(this));
         this.router.patch(`${this.path}/update/text/:id`, isAuthenticated, validationFormData(createPost), this.updateTextPost.bind(this));
@@ -35,11 +35,11 @@ class PostController implements Controller {
 
     private formatImgFile(req: Request): Image[] | undefined {
         const files: Image[] = [];
-                    
+
         if (!Array.isArray(req.files)) {
             return;
         }
-    
+
         req.files.forEach((file) => {
             files.push({
                 filename: file.filename,
@@ -63,7 +63,7 @@ class PostController implements Controller {
             });
 
             res.status(201).json(post);
-        } 
+        }
         catch (error: any) {
             next(new HttpException(400, error.message));
         }
@@ -79,7 +79,7 @@ class PostController implements Controller {
                 author: { id: req.user._id as UserID, pseudo: req.user.pseudo },
                 images: files
             });
-            
+
             res.status(201).json(comment);
         } 
         catch (error: any) {
@@ -91,7 +91,7 @@ class PostController implements Controller {
         try {
             const page = req.query.page ? Number(req.query.page) : 1;
             const limit = req.query.limit ? Number(req.query.limit) : 5; // 15
-            
+
             const { posts, countPosts } = await this.PostServices.getManyPosts(page, limit);
 
             res.status(200).json({

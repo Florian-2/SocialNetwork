@@ -9,9 +9,11 @@ import Dropdown from '@/components/ui/Dropdown.vue';
 import IconAngleDown from '@/components/icons/IconAngleDown.vue';
 import IconAngleUp from '@/components/icons/IconAngleUp.vue';
 import IconSearch from '@/components/icons/IconSearch.vue';
+// import { usePostStore } from '@/resources/posts/store/post';
 
 
 const userStore = useUserStore();
+// const postStore = usePostStore();
 const router = useRouter();
 
 const buttonShowDropdownRef = ref<HTMLElement>();
@@ -21,6 +23,8 @@ const toggleShowDropdown = () => showDropdown.value = !showDropdown.value;
 async function logout() {
     try {
         await userStore.logout();
+        // userStore.$reset();
+        // postStore.$reset();
         router.push("Login");
     } 
     catch (error) {
@@ -38,7 +42,10 @@ const toProfile = () => {
     <header>
         <div class="container">
             <div class="logo">
-                <h1>Hola</h1>
+                <RouterLink to="/posts">
+                    <h1>Hola</h1>
+                </RouterLink>
+
                 <div id="point"></div>
             </div>
 

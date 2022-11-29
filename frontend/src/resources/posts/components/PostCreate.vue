@@ -285,7 +285,7 @@ function onSelectEmoji(emoji: any) {
             gap: 1rem;
 
             .option {
-                padding: 0.5rem;
+                padding: 1rem;
                 display: flex;
                 align-items: center;
                 flex-grow: 1;

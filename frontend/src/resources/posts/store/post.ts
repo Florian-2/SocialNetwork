@@ -16,7 +16,8 @@ export const usePostStore = defineStore('post', () => {
     });
     const pagination = reactive({
         currentPage: 1,
-        resultsPerPage: 5
+        resultsPerPage: 5,
+        moreResults: true
     });
 
     // Actions
@@ -36,10 +37,25 @@ export const usePostStore = defineStore('post', () => {
 
     async function getPosts() {
         try {
-            fetch.isLoading = true;
-            const data = await PostSevices.getPosts();
-            posts.value = data;
-        } 
+            if (pagination.moreResults) {
+                fetch.isLoading = true;
+
+                const { posts: data, pagination: pages } = await PostSevices.getPosts(pagination.currentPage, pagination.resultsPerPage);
+
+                if (pages.totalPages === pagination.currentPage) {
+                    pagination.moreResults = false;
+                }
+
+                if (pages.totalPages > pagination.currentPage) {
+                    pagination.currentPage++;
+                }
+
+                posts.value.push(...data);
+            }
+            else {
+                console.log("plus de posts");
+            }
+        }
         catch (error) {
             throw error;
         }

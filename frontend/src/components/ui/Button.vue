@@ -7,7 +7,7 @@ defineProps<{
 </script>
 
 <template>
-    <button :class="type" :disabled="disabled">
+    <button :class="type" :disabled="disabled || isLoading">
         <span v-if="isLoading">Chargement...</span>
 
         <template v-else>
