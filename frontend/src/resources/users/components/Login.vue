@@ -48,12 +48,14 @@ const {
 const onSubmit = form.handleSubmit(async (formData) => {       
     try {
         await userStore.login(formData);
+
+        console.log("login ok");
         router.push({ name: "Posts" });
     } 
     catch (e) {
         if (e instanceof AxiosError) { 
             errorServer.value = e.response?.data.message;
-                
+
             const errors = e.response?.data?.errors;
             if (errors) {
                 form.setErrors({ ...errors });
@@ -66,7 +68,6 @@ const handleShowPassword = (): boolean => showPassword.value = !showPassword.val
 </script>
 
 <template>
-
     <section class="form-container">
         <div class="form-content">
             <h1>{{ t("form.title.login") }}</h1>

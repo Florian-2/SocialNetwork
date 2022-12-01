@@ -9,11 +9,11 @@ import Dropdown from '@/components/ui/Dropdown.vue';
 import IconAngleDown from '@/components/icons/IconAngleDown.vue';
 import IconAngleUp from '@/components/icons/IconAngleUp.vue';
 import IconSearch from '@/components/icons/IconSearch.vue';
-// import { usePostStore } from '@/resources/posts/store/post';
+import { usePostStore } from '@/resources/posts/store/post';
 
 
 const userStore = useUserStore();
-// const postStore = usePostStore();
+const postStore = usePostStore();
 const router = useRouter();
 
 const buttonShowDropdownRef = ref<HTMLElement>();
@@ -23,8 +23,18 @@ const toggleShowDropdown = () => showDropdown.value = !showDropdown.value;
 async function logout() {
     try {
         await userStore.logout();
-        // userStore.$reset();
-        // postStore.$reset();
+        // reset store
+        userStore.$patch({
+            currentUser: null,
+            isAuthenticated: false
+        });
+        postStore.$patch({
+            posts: [],
+            pagination: {
+                currentPage: 1,
+                moreResults: true
+            }
+        });
         router.push("Login");
     } 
     catch (error) {

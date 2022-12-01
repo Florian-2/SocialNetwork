@@ -52,7 +52,6 @@ export const useUserStore = defineStore('user', () => {
 	async function logout() {
 		try {
 			await AuthServices.logout();
-			currentUser.value = null;
 		} 
 		catch (error) {
 			throw error;
